@@ -1,0 +1,129 @@
+---
+title: "R Basics"
+date: January 10, 2024
+author: "Noah Gibson"
+format: html
+---
+
+## File types
+
+-   R Script:
+    -   **Purpose:** R Scripts are plain text files containing a series of R commands. They are used for running R code line by line or as a complete script.
+    -   **Output:** R Scripts do not generate formatted reports or documents. They are primarily used for code execution and analysis.
+-   R Markdown:
+    -   **Purpose:** R Markdown is an extension of Markdown that allows the embedding of R code chunks. It is used to create dynamic documents that combine narrative text, code, and the results of code execution.
+    -   **Output:** R Markdown documents can be rendered into various output formats such as HTML, PDF, or Word. The output includes both the formatted text and the executed code results.
+-   Quarto:
+    -   **Purpose:** Quarto is a document format and tool for creating data science and technical documents. It supports multiple programming languages (including R, Python, Julia, and Stata) and is designed for creating reproducible and interactive documents.
+    -   **Output:** Quarto documents can be rendered into various output formats like HTML, PDF, Word, and more. Quarto provides features for managing code output, creating interactive elements, and integrating different programming languages seamlessly.
+
+## Packages
+
+-   Install packages **once** on your laptop. Install in `Console` rather than a code chunk if using Quarto.
+
+-   Use `library()` to call a package each time you open a new Quarto file.
+
+```{r}
+library(tidyverse)
+```
+
+## Objects
+
+-   You can define different types of objects by using `<-`.
+
+```{r}
+first_number <- 40
+second_number <- 5
+
+first_number + second_number
+```
+
+-   Note: The code `first_number + second_number` displays the number 45 while `first_number <- 40` and `second_number <- 5` saved the respective numbers in your `Environment` pane.
+
+-   You can also define characters.
+
+```{r}
+my_character <- "Hello, World!"
+
+my_character
+```
+
+-   Now let's create a dataframe.
+
+```{r}
+name <-
+  c(
+    "Wayne Gretzky",
+    "Gordie Howe",
+    "Jaromir Jagr",
+    "Brett Hull",
+    "Marcel Dionne",
+    "Phil Esposito" ,
+    "Mike Gartner",
+    "Alex Ovechkin",
+    "Mark Messier" ,
+    "Steve Yzerman"
+  )
+
+goals <- c(894, 801, 766, 741, 731, 717, 708, 700, 694, 692)
+
+year_started <- c(1979, 1946, 1990, 1986, 1971, 1963, 1979, 2005, 1979, 1983)
+```
+
+```{r}
+# combine each row 
+
+df <- tibble(Name = name,
+             Goals = goals,
+             Year = year_started)
+
+df
+```
+
+# Other code/files
+
+You can use different types of code within the same Quarto document. And you can decide to render the document as an html, pdf, or Word doc.
+
+-   Python code
+
+```{python}
+# This is a Python code block
+def hello_world():
+    print("Hello, World!")
+
+hello_world()
+```
+
+-   Latex equations $$
+    price = \hat{\beta}_0 + \hat{\beta}_1 \times area + \epsilon
+    $$
+
+## Example
+
+Let's walk through a brief example. It is fine if most of these commands don't make sense yet! It is intended to get you messing around in R before the first lab.
+
+> Try to find the two counties with the highest and lowest median income in your home state (or choose a random state). You will need to modify my code slightly.
+
+-   Download 2021 census data from my Github page and name it `med_income`.
+
+```{r}
+med_income <- read.csv("https://raw.githubusercontent.com/noahwgibson/soc223/main/median_income.csv")
+```
+
+-   Filter for your home state ("Ohio" in my case).
+
+```{r}
+# note that we are creating a new dataset called ohio
+# this will save it to your environment pane rather than display it 
+
+ohio <- med_income |> 
+  filter(State == "Ohio")
+```
+
+-   Now find the max and min median income.
+
+```{r}
+ohio |> 
+  slice(which.min(median_income), which.max(median_income)) |> 
+  select(County, median_income)
+```
