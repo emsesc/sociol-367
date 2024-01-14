@@ -1,0 +1,138 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[**Lab #1 Markdown File**](/assignments/Lab_1.Rmd)
+
+[**Lab Instructions**](https://dssoc.github.io/assignments/lab_instructions.html)
+
+In this lab we will be learning the basics of using R and working with real data.
+
+See the "Instructions" section of the [Lab Instructions](https://dssoc.github.io/assignments/lab_instructions.html) page for more information about the labs. That page also gives descriptions for the datasets we will be using.
+
+**Required reading:**
+
+-   [R for Data Science Chapter 4: Workflow basics](https://r4ds.had.co.nz/workflow-basics.html)
+-   [R4DS Chapters 26-30: Communicating your analysis](https://r4ds.had.co.nz/communicate-intro.html) (Except Chapter 28 - we will cover visualization later.)
+
+**Optional resources:**
+
+-   [RDocumentation.org](%5Bdocumentation%20website%5D(https://www.rdocumentation.org/))
+
+```{r message=FALSE, echo=FALSE}
+# Load the datasets and libraries. You shouldn't need to change the URL in the `load` function.
+
+library(tidyverse)
+library(readxl)
+
+# this will download the dataset from the course website
+load(url('https://dssoc.github.io/datasets/congress.RData'))
+```
+
+<br/>
+
+## Practice Questions
+
+**ex1. What is the sum of the values of `some_vector`?**
+
+```{r}
+some_vector <- c(25555,342343,123123123,4234234,53243234,54324234,5421111,12312312,111231)
+sum(some_vector)
+```
+
+**ex2. Compute the sum of all integers 1 through 100, inclusive.**
+
+HINT: The solution to this problem is found in the required readings.
+
+```{r}
+sum(seq(1, 100))
+```
+
+## Questions
+
+<br>
+
+**1. Use the [documentation website](https://www.rdocumentation.org/) or the helper functions in R (`?function_name`) to look up the `mean` function, and describe each of its arguments and what they do in your own words. Write your answer in the code block below as a comment.**
+
+NOTE: You can write comments in a code block by including a "\#" character at the beginning of the line.
+
+```{r}
+# Write your answer here.
+# The x argument of the mean() function is the R object containing the numbers that you want to find the mean of. The trim argument defines the fraction of numbers to be removed from the x argument. The na.rm argument is a true/false value that defines whether NA values should be counted.
+```
+
+<br>
+
+**2. Extract the third element of the vector using numerical indexing.**
+
+NOTE: the first element index starts with 1 in R.
+
+```{r}
+my_vector <- c("R","is","great")
+# your code here
+my_vector[1]
+```
+
+<br>
+
+**3. This question has several parts: (a) Use R code to identify the data type of `some_vector`. (b) What is the largest number in this vector? (c) How about the mean value? (d) Does this vector include the number `54324222`? Your results should be generated from the R code - please do not write the numbers into R manually.**
+
+HINT: you'll have to research some new functions in r to do this- try Google or one of the tutorials linked on the syllabus.
+
+HINT: check out the `%in%` operator.
+
+```{r}
+some_vector <- c(25555,342343,123123123,4234234,53243234,54324234,5421111,12312312,111231,
+                     1231231,12312312,12312312,123123,898972,789872,2343,23423423,2343221,23423,
+                     14444,44324222,2342341,124231111,22233345,1111233333,1231231,1231231)
+# your code here
+# a)
+typeof(some_vector)
+# b)
+max(some_vector)
+# c)
+mean(some_vector)
+# d)
+54324222 %in% some_vector
+```
+
+<br>
+
+**4. Use the `congress` dataframe for the remainder of questions in this assignment. (a) How many rows and columns does the `congress` dataframe have? (b) Use a function to show its data type. You must use R code to generate these values.**
+
+```{r}
+# your code here
+# a)
+nrow(congress)
+ncol(congress)
+# b)
+typeof(congress)
+```
+
+<br>
+
+**5. Using the browse features of R or RStudio, write the ages of Sherrod Brown (a member of congress) and Dianne Feinstein.**
+
+```         
+Your written response here.
+Sherrod Brown: 71
+Dianne Feinstein: 90
+```
+
+<br>
+
+**6. What is the average birthyear of congress members? What is the data type of the `birthyear` column?**
+
+```{r}
+# your code here
+mean(congress[["birthyear"]])
+```
+
+<br>
+
+**7. What are your learning goals for this semester? Not a trick question ;)**
+
+```         
+1) I've worked with R before, but I mostly relied on ChatGPT to write code, so I want to become more familiar with the syntax this semester.
+2) I want to learn how to conduct my own statistically sound research and go through the steps of data collection, 
+```
