@@ -127,6 +127,7 @@ Dianne Feinstein: 90
 # your code here
 mean(congress[["birthyear"]])
 typeof(congress[["birthyear"]])
+# the key difference is that single brackets return a data frame with one column, while double brackets return the actual vector (column)
 ```
 
 <br>
