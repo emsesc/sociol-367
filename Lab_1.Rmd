@@ -126,6 +126,7 @@ Dianne Feinstein: 90
 ```{r}
 # your code here
 mean(congress[["birthyear"]])
+typeof(congress[["birthyear"]])
 ```
 
 <br>
@@ -134,5 +135,6 @@ mean(congress[["birthyear"]])
 
 ```         
 1) I've worked with R before, but I mostly relied on ChatGPT to write code, so I want to become more familiar with the syntax this semester.
-2) I want to learn how to conduct my own statistically sound research and go through the steps of data collection, 
+2) I want to learn how to properly conduct my own statistically sound research and go through the steps of data collection, cleaning, and analysis.
+3) I want to learn how to apply ethical principles to evaluate my own research.
 ```
