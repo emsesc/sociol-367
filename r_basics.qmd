@@ -117,7 +117,7 @@ med_income <- read.csv("https://raw.githubusercontent.com/noahwgibson/soc223/mai
 # this will save it to your environment pane rather than display it 
 
 ohio <- med_income |> 
-  filter(State == "Ohio")
+  filter(State == "North Carolina")
 ```
 
 -   Now find the max and min median income.

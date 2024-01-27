@@ -1,0 +1,205 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[**Lab #2 Markdown File**](/assignments/Lab_2.Rmd)
+
+[**Lab Instructions**](https://dssoc.github.io/assignments/lab_instructions.html)
+
+In this lab we will practice using methods from the `tidyverse` package.
+
+See the "Instructions" section of the [Introduction to Lab Assignments](https://dssoc.github.io/assignments/lab_instructions.html) page for more information about the labs. That page also gives descriptions for the datasets we will be using.
+
+**Required reading:**
+
+-   [R4DS Chapter 5: Data transformation](https://r4ds.had.co.nz/transform.html)
+-   [R4DS Chapter 18: Pipes](https://r4ds.had.co.nz/pipes.html)
+-   [R4DS Chapter 7: Exploratory data analysis](https://r4ds.had.co.nz/exploratory-data-analysis.html)
+
+**Optional resources:**
+
+-   [`gather` function documentation](https://tidyr.tidyverse.org/reference/gather.html#examples) (see examples)
+-   [More dplyr examples](https://rstudio.cloud/learn/primers/2)
+-   [More help with tidy](https://rstudio.cloud/learn/primers/4)
+-   [R4DS Chapters 9-16](https://r4ds.had.co.nz/wrangle-intro.html)
+
+```{r message=FALSE, echo=FALSE}
+# Load the datasets and libraries. You shouldn't need to change the URL in the `load` function.
+
+library(tidyverse)
+
+load(url('https://dssoc.github.io/datasets/congress.RData'))
+```
+
+<br/>
+
+## Example Questions
+
+<br>
+
+**ex1. how many female and male senators from the Democrat party are older than 60? For this and all assignments, you may approximate age as `approx age = current year - birthyear`.**
+
+```{r}
+# this solution uses pipes (see required reading)
+congress %>% 
+  filter(type=='sen', party=='Democrat', birthyear > 1962) %>% 
+  count(gender)
+
+# this is old-school
+tmp <- filter(congress, type=='sen', party=='Democrat', birthyear > 1962)
+count(tmp, gender)
+```
+
+**ex2. Give the names of the 2 oldest senators.**
+
+```{r}
+# this solution uses pipes
+congress %>% 
+  filter(type=='sen') %>% 
+  arrange(birthyear) %>% 
+  select(full_name) %>% 
+  head(2)
+```
+
+**ex3. How many valid Twitter and Facebook account handles are there in `congress_contact`?**
+
+```{r}
+# your answer here
+congress_contact %>% 
+  select(facebook, youtube) %>% 
+  gather(key='platform', value='handle', facebook, youtube) %>% 
+  count(are_valid = handle!='') %>% 
+  filter(are_valid)
+
+congress_contact %>% 
+  select(facebook, youtube) %>% 
+  pivot_longer(facebook:youtube, names_to='platform', values_to='handle') %>% 
+  count(are_valid = handle!='') %>% 
+  filter(are_valid)
+```
+
+## Questions
+
+<br>
+
+**1. Describe what the following tidyverse functions do. Also describe the pipe operator "%\>%". You may need to look up the [official documentation](https://www.rdocumentation.org/) for each of these.**
+
+```         
+filter: Keeps rows that meet a specific set of conditions
+select: Pulls out specific variables in the data frame
+mutate: Adds new variables while keeping the original ones
+count: Provides a count of overall data frame or specific variables
+arrange: Change row order by specified variable values
+gather: Merges the values of multiple columns into one
+pivot_longer: Similar to gather, reduces columns into more rows
+pipe operator ("%>%"): Takes the output of the previous argument into the next statement
+```
+
+<br/>
+
+**2. How many male and female members are representatives and senators? Your output should appear as a single dataframe with four rows corresponding to female representatives, female senators, male representatives, and male senators.**
+
+NOTE: you can identify representators by `type=="rep"` and senators using `type=="sen"`.
+
+```{r}
+congress %>% 
+  filter(type=='rep' | type=='sen') %>% 
+  count(gender, type)
+
+# &, | etc.
+# your answer here
+```
+
+<br/>
+
+**3. Create a dataframe showing the oldest and youngest female senator democrats using only R code.**
+
+HINT: check out the `slice()` function.
+
+```{r}
+congress %>% 
+  filter(gender=='F', type=='sen', party=='Democrat') %>% 
+  arrange(birthdate) %>%
+  slice(c(1,n()))
+# your answer here
+```
+
+<br/>
+
+**4. Using `mutate`, create a new variable called `age` which represents the approximate age of each member of congress. How many democratic senators are over 60 years old?**
+
+Note: For this and all future questions this semester, you can approximate age using the formula `age = 2022-birthyear` (or replace 2022 with the current year).
+
+```{r}
+congress %>%
+  mutate(age = 2024 - birthyear) %>%
+  filter(type=='sen', party=='Democrat', age>60) %>%
+  count()
+# your answer here
+```
+
+<br/>
+
+**5. Create a new column that indicates whether or not the member of congress is more than 55 years old, and create a single dataframe showing the number of male and female members of congress that are over and under 55.**
+
+Note: the dataframe should have four rows: number of females over 55, number of males over 55, number of females 55 and under, number of males 55 and under.
+
+```{r}
+congress %>%
+  mutate(years_over_55 = ifelse(2024 - birthyear > 55, "Over", "Under")) %>%
+  count(years_over_55, gender)
+
+# figure out how to make a col name with spaces...
+# your answer here
+```
+
+<br/>
+
+**6. For this problem, use the `congress_contact` dataframe that includes the contact information for each member of congress. Using `gather`, create a new dataframe where each row corresponds to a valid twitter, facebook, or youtube social media account username (for youtube you can ignore `youtube_id`), and compute *the total number of valid accounts across all congress members*. Then accomplish the same task using `pivot_longer`.**
+
+HINT: see the link to the `gather` function documentation in the recommended readings to get a better sense of how it works. You can use the example data they show to try it for yourself.
+
+HINT: the account name will be an empty string in cases where the member of congress does not have a valid user account, so you can filter using the conditional `column_name != ''`. This compares each value in the column called `column_name` to an empty string to determine whether it is a valid account.
+
+```{r}
+social_media_usernames <- congress_contact %>%
+  gather(key=platform, value=username, twitter, facebook, youtube) %>%
+  filter(username != ' ')
+
+count(social_media_usernames)
+# your answer here
+```
+
+<br/>
+
+**Below, I define for you two vectors corresponding to policies that US States have adopted to respond to COVID-19: restrictions on travel ([recorded May 20, 2020](https://www.wsj.com/articles/a-state-by-state-guide-to-coronavirus-lockdowns-11584749351)) and requirements that citizens to wear masks in public ([recorded August 17, 2020](https://www.cnn.com/2020/06/19/us/states-face-mask-coronavirus-trnd/index.html)).**
+
+```{r}
+travel_restrictions <- c("WA", "OR", "NV", "CA", "NM", "MN", "IL", "OH", "MI", "PA", "VA", "NY", "MA", "VH", "ME", "DE", "MD", "NJ")
+
+require_masks <- c("HI", "WA", "OR", "NV", "CA", "MT", "CO", "NM", "KS", "TX", "MN", "AR", "LA", "WI", "IL", "AL", "MI", "IN", "OH", "KY", "WV", "NC", "VA", "DC", "DE", "PA", "NY", "VT", "NH", "MA", "RI", "CT", "ME")
+```
+
+<br/>
+
+**7. write code to print only the states who implemented both travel restrictions and mask requirements:**
+
+```{r}
+both_restrict_require <- travel_restrictions %>%
+  filter(. %in% require_masks)
+# your answer here
+```
+
+<br/>
+
+**8. Write code to print the states who had implemented mask requirements but not travel restrictions:**
+
+```{r}
+# your answer here
+```
+
+**9. Describe two broad topics you might be interested in exploring for your final project. How would you use data science to gain insight about these topics? We won't require you to stick with these topics - we just want to see you brainstorming about what you might be interested in.**
+
+```         
+your written response here
+```

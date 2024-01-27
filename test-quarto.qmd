@@ -1,0 +1,52 @@
+---
+title: "r-test"
+format: html
+editor: visual
+---
+
+!! The **Help** Tab and **History** pane is a good resource 
+
+Assigning values to variables
+
+```{r}         
+X <- 3 # preferred version
+Y = 4
+
+# A token is another word for a word
+# Cmd - Shift - C is for commenting multiple lines
+```
+
+Directory Basics
+
+```{r}
+list.files(".")
+list.files("~/Documents")
+# how to browse a folder/dir
+
+getwd()
+# location by default R is loading/saving something
+setwd("~/r-projects/sociol-367")
+```
+
+Installing Packages
+```{r}
+install.packages("tidyverse")
+```
+
+Vectors and Dataframes
+```{r}
+# must load the tidyverse package to use tibble
+library(tidyverse)
+
+my_vector<-c(1,2,3,4)
+my_string_vector<-c("Mike", "Tom", "Abdul", "Grant")
+mytibble<-tibble(likes = my_vector, person = my_string_vector)
+
+mytibble
+my_vector[1]
+mytibble$likes
+mytibble$likes[1]
+mytibble %>% filter(likes)
+
+# index starts with 1, not 0
+```
