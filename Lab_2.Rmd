@@ -1,3 +1,7 @@
+---
+---
+---
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -64,7 +68,6 @@ congress %>%
 **ex3. How many valid Twitter and Facebook account handles are there in `congress_contact`?**
 
 ```{r}
-# your answer here
 congress_contact %>% 
   select(facebook, youtube) %>% 
   gather(key='platform', value='handle', facebook, youtube) %>% 
@@ -102,12 +105,11 @@ pipe operator ("%>%"): Takes the output of the previous argument into the next s
 NOTE: you can identify representators by `type=="rep"` and senators using `type=="sen"`.
 
 ```{r}
-congress %>% 
+rep_sen <- congress %>% 
   filter(type=='rep' | type=='sen') %>% 
   count(gender, type)
 
-# &, | etc.
-# your answer here
+print(rep_sen)
 ```
 
 <br/>
@@ -117,11 +119,13 @@ congress %>%
 HINT: check out the `slice()` function.
 
 ```{r}
-congress %>% 
+oldest_youngest_f_sen_dem <- congress %>% 
   filter(gender=='F', type=='sen', party=='Democrat') %>% 
   arrange(birthdate) %>%
-  slice(c(1,n()))
-# your answer here
+  slice(c(1,n())) %>%
+  select(full_name)
+
+print(oldest_youngest_f_sen_dem)
 ```
 
 <br/>
@@ -135,7 +139,6 @@ congress %>%
   mutate(age = 2024 - birthyear) %>%
   filter(type=='sen', party=='Democrat', age>60) %>%
   count()
-# your answer here
 ```
 
 <br/>
@@ -145,12 +148,11 @@ congress %>%
 Note: the dataframe should have four rows: number of females over 55, number of males over 55, number of females 55 and under, number of males 55 and under.
 
 ```{r}
-congress %>%
-  mutate(years_over_55 = ifelse(2024 - birthyear > 55, "Over", "Under")) %>%
+over_and_under_55 <- congress %>%
+  mutate(years_over_55 = ifelse(2024 - birthyear > 55, "Over 55", "55 and Under")) %>%
   count(years_over_55, gender)
 
-# figure out how to make a col name with spaces...
-# your answer here
+print(over_and_under_55)
 ```
 
 <br/>
@@ -162,12 +164,19 @@ HINT: see the link to the `gather` function documentation in the recommended rea
 HINT: the account name will be an empty string in cases where the member of congress does not have a valid user account, so you can filter using the conditional `column_name != ''`. This compares each value in the column called `column_name` to an empty string to determine whether it is a valid account.
 
 ```{r}
+# with gather
 social_media_usernames <- congress_contact %>%
   gather(key=platform, value=username, twitter, facebook, youtube) %>%
-  filter(username != ' ')
+  filter(username != '')
 
 count(social_media_usernames)
-# your answer here
+
+# with pivot_longer
+social_media_usernames_pivot <- congress_contact %>%
+  pivot_longer(cols = c(twitter, facebook, youtube), names_to = "platform", values_to = "username") %>%
+  filter(username != '')
+
+count(social_media_usernames_pivot)
 ```
 
 <br/>
@@ -185,9 +194,8 @@ require_masks <- c("HI", "WA", "OR", "NV", "CA", "MT", "CO", "NM", "KS", "TX", "
 **7. write code to print only the states who implemented both travel restrictions and mask requirements:**
 
 ```{r}
-both_restrict_require <- travel_restrictions %>%
-  filter(. %in% require_masks)
-# your answer here
+both_restrict_require <- travel_restrictions[travel_restrictions %in% require_masks]
+print(both_restrict_require)
 ```
 
 <br/>
@@ -195,11 +203,16 @@ both_restrict_require <- travel_restrictions %>%
 **8. Write code to print the states who had implemented mask requirements but not travel restrictions:**
 
 ```{r}
-# your answer here
+require_not_restrict <- require_masks[!(require_masks %in% travel_restrictions)]
+print(require_not_restrict)
 ```
 
 **9. Describe two broad topics you might be interested in exploring for your final project. How would you use data science to gain insight about these topics? We won't require you to stick with these topics - we just want to see you brainstorming about what you might be interested in.**
 
 ```         
-your written response here
+1. Policy: I'm particularly interested in seeing how combining datasets with social media sentiment analysis can yield interesting insights around education and urban development policy. Data science could help gain insight through maybe analyzing how information is spread, through what networks, and how people perceive these decisions.
+
+2. National Parks and Social Media Engagement: I'm interested in seeing how social media can influence traffic to certain parks and how it might influence traffic on specific trails. There are datasets about visitor traffic that the National Parks provides, and this combined with a social media analysis (potentially with geospatial data) could reveal interesting connections.
+
+(Two others are how much of social media is now AI generated, and how is Asian American representation in media portrayed online.)
 ```
