@@ -159,7 +159,13 @@ congress %>%
 HINT: one way to accomplish this is by using gather to create a separate row for each person-account, and summarize to average by age.
 
 ```{r}
-# your answer here
+congress %>%
+  inner_join(congress_contact, by="bioguide_id") %>%
+  gather(key=platform, value=username, twitter, facebook, youtube) %>%
+  group_by(platform) %>%
+  summarise(average_age = mean(2024-birthyear)) %>%
+  ggplot(aes(x=platform, y=average_age)) +
+  geom_bar(stat='identity', position='dodge')
 ```
 
 <br/>
