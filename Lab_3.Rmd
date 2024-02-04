@@ -163,6 +163,7 @@ congress %>%
   inner_join(congress_contact, by="bioguide_id") %>%
   gather(key=platform, value=username, twitter, facebook, youtube) %>%
   group_by(platform) %>%
+  filter(username!='') %>%
   summarise(average_age = mean(2024-birthyear)) %>%
   ggplot(aes(x=platform, y=average_age)) +
   geom_bar(stat='identity', position='dodge')
@@ -177,7 +178,15 @@ HINT: as described in the Lab Instructions page, you will need to perform a join
 HINT: you should perform a join to get ONLY subcommittee (and not committee) memberships. Refer to the Lab Instructions page for more information about this dataset.
 
 ```{r}
-# your answer here
+subcommittees %>% 
+  inner_join(committee_memberships, by="thomas_id") %>%
+  right_join(congress, by="bioguide_id") %>%
+  group_by(full_name, gender) %>%
+  summarise(num_membership = sum(!is.na(name))) %>%
+  group_by(gender) %>%
+  summarise(avg_subcommittee_membership = mean(num_membership)) %>%
+  ggplot(aes(x=gender, y=avg_subcommittee_membership)) +
+    geom_bar(stat='identity', position='dodge')
 ```
 
 </br>
@@ -187,7 +196,16 @@ HINT: you should perform a join to get ONLY subcommittee (and not committee) mem
 NOTE: read the Lab Instructions page for more information about the standards for visualizations in this course. The full committee names should appear somewhere on the plot - please do not provide `thomas_id`s only (you may include full committee names in the legend though).
 
 ```{r}
-# your answer here
+committees %>% 
+  inner_join(committee_memberships, by="thomas_id") %>%
+  count(thomas_id) %>%
+  top_n(5, n) %>%
+  ggplot(aes(fill=thomas_id, x=reorder(thomas_id, -n), y=n)) +
+    geom_bar(stat='identity', position='dodge') +
+    scale_fill_manual("Full Committees", 
+                      values=c("coral", "cyan4", "springgreen4", "steelblue", "tomato3"), 
+                      breaks = c("HSPW", "HSAS", "HSAP", "HSIF", "HSBA"),
+                      labels=c("House Committee on Transportation and Infrastructure","House Committee on Armed Services", "House Committee on Appropriations", "House Committee on Energy and Commerce", "House Committee on Financial Services"))
 ```
 
 <br/>
