@@ -215,7 +215,22 @@ committees %>%
 This means you will need to join three dataframes: `committee_memberships` for membership information, `committees` to separate full committees from subcommittees and get committee names, and `congress` to get age information.
 
 ```{r}
-# your answer here
+average_age <- committees %>% 
+  inner_join(committee_memberships, by="thomas_id") %>%
+  inner_join(congress, by="bioguide_id") %>%
+  group_by(name, thomas_id) %>%
+  summarize(average_age = mean(2024-birthyear)) %>%
+  arrange(average_age)
+  
+average_age %>%
+  head(5) %>%
+  bind_rows(tail(average_age, 5)) %>%
+  ggplot(aes(fill=thomas_id, x=reorder(thomas_id, -average_age), y=average_age)) +
+  geom_bar(stat='identity', position='dodge') +
+  scale_fill_manual("Full Committees", 
+                      values=c("coral", "cyan4", "springgreen4", "steelblue", "tomato3", "burlywood1", "darkslateblue", "deeppink3", "aquamarine3", "blueviolet"), 
+                      breaks = c("HSEF", "HSVR", "HSCN", "HSAS", "HSSO", "SSRA", "SSEV", "JCSE", "SCNC", "JSTX"),
+                      labels=c("House Select Committee on Economic Disparity and Fairness in Growth","House Committee on Veterans' Affairs", "House Select Committee on the Climate Crisis", "House Committee on Armed Services", "House Committee on Ethics", "Senate Committee on Rules and Administration", "Senate Committee on Environment and Public Works", "Commission on Security and Cooperation in Europe", "United States Senate Caucus on International Narcotics Control", "Joint Committee on Taxation"))
 ```
 
 <br/>
