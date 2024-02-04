@@ -1,0 +1,186 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[**Lab #3 Markdown File**](/assignments/Lab_3.Rmd)
+
+[**Lab Instructions**](https://dssoc.github.io/assignments/lab_instructions.html)
+
+In this lab we will practice using the `ggplot2` library to create visualizations of our data. **Our standard for visualizations is that each plot should have axis labels, all labels must be readable to someone unfamiliar with your data (e.g. Female and Male instead of `F` and `M`, Senator and Representative instead of `rep` and `sen`), and we should easily be able to tell what your figure is showing. Failure to do this will result in point deductions.**
+
+See the "Instructions" section of the [Introduction to Lab Assignments](https://dssoc.github.io/assignments/lab_instructions.html) page for more information about the labs. That page also gives descriptions for the datasets we will be using.
+
+**Required reading:**
+
+-   [R for Data Science Chapter 13: Relational data](https://r4ds.had.co.nz/relational-data.html)
+-   [R for Data Science Chapter 3: Data visualization](https://r4ds.had.co.nz/data-visualisation.html)
+-   [R for Data Science Chapter 28: Graphics for communication](https://r4ds.had.co.nz/graphics-for-communication.html)
+
+**Optional resources:**
+
+-   [R for Data Science Chapter 16: Dates and times](https://r4ds.had.co.nz/dates-and-times.html)
+-   [Grouped, stacked and percent stacked barplot in ggplot2](https://www.r-graph-gallery.com/48-grouped-barplot-with-ggplot2.html)
+
+```{r message=FALSE, echo=FALSE}
+# Load the datasets and libraries. You shouldn't need to change the URL in the `load` function.
+
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+
+load(url('https://dssoc.github.io/datasets/congress.RData'))
+load(url('https://dssoc.github.io/datasets/committees.RData'))
+```
+
+<br/>
+
+## Example Questions
+
+<br>
+
+**ex1. make a bar chart showing the number of male and female members of congress in our dataset.**
+
+```{r}
+congress %>% 
+  ggplot(aes(x=gender)) +
+    geom_bar()
+```
+
+<br/>
+
+**ex2. make a bar chart showing the proportion of female senators in each pol.**
+
+```{r}
+congress %>% 
+  group_by(party) %>% 
+  summarize(proportion_gender=mean(gender=='F')) %>% 
+  ggplot(aes(x=party, y=proportion_gender)) +
+    geom_bar(stat='identity', position='dodge')
+```
+
+<br/>
+
+## Questions
+
+<br>
+
+**1. Describe the functionality of each of the following functions:**
+
+```         
+group_by: Groups variables in a column, orders in ascending order to be used to aggregate data using summarise(); doesn't produce any output on its own. (ex: to calculuate the mean of each country, you can group_by country and then pipe into summarise.)
+summarise: Creates a new data frame and returns rows that combines the grouped variables of summary data.
+inner_join: Keeps observations from column 1 that have a matching observation in column 2
+left_join: Keeps observations that are in column 1
+ggplot: Takes in data to create plots
+```
+
+<br/>
+
+**2. Create a bar plot to show the average ages of congress members from each political party. Now do the same for M and F genders.**
+
+```{r}
+congress %>%
+  group_by(party) %>% 
+  summarize(proportion_age=mean(2024 - birthyear)) %>% 
+  ggplot(aes(x=party, y=proportion_age)) +
+    geom_bar(stat='identity', position='dodge')
+
+congress %>%
+  group_by(gender) %>% 
+  summarize(proportion_gender=mean(2024 - birthyear)) %>% 
+  ggplot(aes(x=gender, y=proportion_gender)) +
+    geom_bar(stat='identity', position='dodge')
+```
+
+<br/>
+
+**3. Create a line graph showing the total number of congress member births in each decade since the 1930's, with separate lines for senate and house members (see the `type` column). The labels on your x-axis should look like "1930's", "1940's", and so on, and your legend should show names "Senator" and "Representative" (i.e. not `rep` and `sen`).**
+
+Note: The plotted lines may not show up in decades where there were no births - that is okay.
+
+```{r}
+congress %>%
+  mutate(decade = sprintf("%d's", floor(birthyear/10)*10)) %>%
+  count(decade, type) %>%
+  ggplot(aes(x=decade, y=n, color=type), group=1) +
+  xlab("Decade") +
+	ylab("Count") +
+  geom_step() +
+  geom_point()
+
+
+```
+
+<br/>
+
+**4. Create a bar chart showing the average ages of Senators and Representatives separately by weekday. The plot should make it easy to compare Senators and Representatives within each weekday. The x-labels should be weekday names and appear in chronological order.**
+
+NOTE: For convenience, I have already parsed the `birthdate` column into a `date` type.
+
+NOTE: the final plot should have 14 bars: 7 weekdays by 2 types of congress members (Senators and Representatives).
+
+HINT: see the Optional Readings for more information about grouped bar charts using `ggplot2`.
+
+```{r}
+# your answer here
+```
+
+<br/>
+
+**5. Use an inner join to combine the columns of the `congress` dataframe with the columns of `congress_contacts` and show the average proportion of congress members with valid Facebook accounts by gender.**
+
+HINT: you will want to join the dataframes based on a column that is common to both datasets.
+
+```{r}
+# your answer here
+```
+
+<br/>
+
+**6. Create a bar chart comparing the average age of congress members that have valid Twitter, Facebook, and YouTube accounts. Each bar should correspond to a social media platform and the height should correspond to the average age of congress members with that type of account.**
+
+HINT: one way to accomplish this is by using gather to create a separate row for each person-account, and summarize to average by age.
+
+```{r}
+# your answer here
+```
+
+<br/>
+
+**7. The remainder of problems in this homework will involve the use of the `committees.RData` dataset. Create a plot showing the average number of subcommittees that congress members belong to by gender.**
+
+HINT: as described in the Lab Instructions page, you will need to perform a join between the `subcommittees` and `committee_memberships` dataframes to get ONLY subcommittee (and not committee) memberships. You may copy-paste the code from the Lab Instructions page if that would be helpful.
+
+HINT: you should perform a join to get ONLY subcommittee (and not committee) memberships. Refer to the Lab Instructions page for more information about this dataset.
+
+```{r}
+# your answer here
+```
+
+</br>
+
+**8. Create a bar plot showing the number of members that belong to the 5 largest full congressional committees (i.e. full committees with the largest number of members). The bars should be sorted based on committee sizes.**
+
+NOTE: read the Lab Instructions page for more information about the standards for visualizations in this course. The full committee names should appear somewhere on the plot - please do not provide `thomas_id`s only (you may include full committee names in the legend though).
+
+```{r}
+# your answer here
+```
+
+<br/>
+
+**9. Create a single bar plot that shows the average age of the full committees with the 5 highest and lowest average ages. The bars should be sorted based on average committee ages.**
+
+This means you will need to join three dataframes: `committee_memberships` for membership information, `committees` to separate full committees from subcommittees and get committee names, and `congress` to get age information.
+
+```{r}
+# your answer here
+```
+
+<br/>
+
+**10. Using the topics you described last week or a new topic you have been thinking about, describe two social science questions that you would be interested in exploring for your final project. Do you think these questions might be answerable using real data?**
+
+```{r}
+# your answer here
+```
