@@ -248,6 +248,12 @@ average_age %>%
 
 **10. Using the topics you described last week or a new topic you have been thinking about, describe two social science questions that you would be interested in exploring for your final project. Do you think these questions might be answerable using real data?**
 
-```{r}
-# your answer here
+```         
+Topic: Museums
+Question: Has the increase of innovations in technology increased museum interest or resulted in lower visitor rates?
+
+Topic: National Parks
+Question: What factors influence higher visitor rates at National Parks, including monuments and other historical locations?
+
+I think about of these questions are answerable with real data, though data regarding the National Parks might be easier to obtain than visitor data from museum that could be under private domain. I assume that Google likely contains a lot of data regarding visitors at locations, along with reviews that are date-stamped. I think that these questions would be more feasible if they were narrower in scope.
 ```
