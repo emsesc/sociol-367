@@ -205,16 +205,17 @@ subcommittees %>%
 NOTE: read the Lab Instructions page for more information about the standards for visualizations in this course. The full committee names should appear somewhere on the plot - please do not provide `thomas_id`s only (you may include full committee names in the legend though).
 
 ```{r}
-committees %>% 
+result <- committees %>% 
   inner_join(committee_memberships, by="thomas_id") %>%
-  count(thomas_id) %>%
-  top_n(5, n) %>%
-  ggplot(aes(fill=thomas_id, x=reorder(thomas_id, -n), y=n)) +
-    geom_bar(stat='identity', position='dodge') +
-    scale_fill_manual("Full Committees", 
-                      values=c("coral", "cyan4", "springgreen4", "steelblue", "tomato3"), 
-                      breaks = c("HSPW", "HSAS", "HSAP", "HSIF", "HSBA"),
-                      labels=c("House Committee on Transportation and Infrastructure","House Committee on Armed Services", "House Committee on Appropriations", "House Committee on Energy and Commerce", "House Committee on Financial Services")) +
+  count(thomas_id, name) %>%
+  top_n(5, n)
+  
+ggplot(result, aes(fill=thomas_id, x=reorder(thomas_id, -n), y=n)) +
+  geom_bar(stat='identity', position='dodge') +
+  scale_fill_manual("Full Committees", 
+                    values=c("coral", "cyan4", "springgreen4", "steelblue", "tomato3"), 
+                    breaks = result$thomas_id,
+                    labels = result$name) +
   labs(x = "Full Committee", y = "Number of Members", title = "Sizes of 5 Largest Full Congressional Committees")
 ```
 
@@ -239,8 +240,8 @@ average_age %>%
   geom_bar(stat='identity', position='dodge') +
   scale_fill_manual("Full Committees", 
                       values=c("coral", "cyan4", "springgreen4", "steelblue", "tomato3", "burlywood1", "darkslateblue", "deeppink3", "aquamarine3", "blueviolet"), 
-                      breaks = c("HSEF", "HSVR", "HSCN", "HSAS", "HSSO", "SSRA", "SSEV", "JCSE", "SCNC", "JSTX"),
-                      labels=c("House Select Committee on Economic Disparity and Fairness in Growth","House Committee on Veterans' Affairs", "House Select Committee on the Climate Crisis", "House Committee on Armed Services", "House Committee on Ethics", "Senate Committee on Rules and Administration", "Senate Committee on Environment and Public Works", "Commission on Security and Cooperation in Europe", "United States Senate Caucus on International Narcotics Control", "Joint Committee on Taxation")) +
+                      breaks = average_age$thomas_id,
+                      labels = average_age$name) +
     labs(x = "Full Committee", y = "Average Age", title = "Full Committees with 5 Highest and Lowest Average Ages")
 ```
 
@@ -255,5 +256,5 @@ Question: Has the increase of innovations in technology increased museum interes
 Topic: National Parks
 Question: What factors influence higher visitor rates at National Parks, including monuments and other historical locations?
 
-I think about of these questions are answerable with real data, though data regarding the National Parks might be easier to obtain than visitor data from museum that could be under private domain. I assume that Google likely contains a lot of data regarding visitors at locations, along with reviews that are date-stamped. I think that these questions would be more feasible if they were narrower in scope.
+I think about of these questions are answerable with real data, though data regarding the National Parks might be easier to obtain than visitor data from museums that could be under a private domain. I assume that Google likely contains a lot of data regarding visitors at locations, along with reviews that are date-stamped. I think that these questions would be more feasible if they were narrower in scope.
 ```
