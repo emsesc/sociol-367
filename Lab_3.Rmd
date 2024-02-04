@@ -102,11 +102,13 @@ Note: The plotted lines may not show up in decades where there were no births - 
 congress %>%
   mutate(decade = sprintf("%d's", floor(birthyear/10)*10)) %>%
   count(decade, type) %>%
-  ggplot(aes(x=decade, y=n, color=type), group=1) +
+  ggplot(aes(x=decade, y=n, color=type, group=type)) +
   xlab("Decade") +
 	ylab("Count") +
-  geom_step() +
-  geom_point()
+  geom_line() +
+  geom_point() +
+  scale_colour_manual("Type",values=c("red", "blue"), labels=c("Representative","Senator"))
+
 
 
 ```
