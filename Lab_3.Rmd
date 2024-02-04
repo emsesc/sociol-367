@@ -69,8 +69,8 @@ congress %>%
 ```         
 group_by: Groups variables in a column, orders in ascending order to be used to aggregate data using summarise(); doesn't produce any output on its own. (ex: to calculuate the mean of each country, you can group_by country and then pipe into summarise.)
 summarise: Creates a new data frame and returns rows that combines the grouped variables of summary data.
-inner_join: Keeps observations from column 1 that have a matching observation in column 2
-left_join: Keeps observations that are in column 1
+inner_join: Keeps observations from one data frame that have a matching observation in another data frame
+left_join: Keeps observations that are in the first data frame
 ggplot: Takes in data to create plots
 ```
 
@@ -145,7 +145,11 @@ congress %>%
 HINT: you will want to join the dataframes based on a column that is common to both datasets.
 
 ```{r}
-# your answer here
+congress %>%
+  inner_join(congress_contact, by="bioguide_id") %>%
+  group_by(gender) %>%
+  summarise(prop_facebook_valid = mean(facebook !=''))
+  
 ```
 
 <br/>
