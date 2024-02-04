@@ -107,7 +107,7 @@ congress %>%
 	ylab("Count") +
   geom_line() +
   geom_point() +
-  scale_colour_manual("Type",values=c("red", "blue"), labels=c("Representative","Senator"))
+  scale_colour_manual("Type",values=c("coral", "cyan4"), labels=c("Representative","Senator"))
 
 
 
@@ -124,7 +124,18 @@ NOTE: the final plot should have 14 bars: 7 weekdays by 2 types of congress memb
 HINT: see the Optional Readings for more information about grouped bar charts using `ggplot2`.
 
 ```{r}
-# your answer here
+congress %>%
+  mutate(weekday=weekdays(birthdate)) %>%
+  group_by(type, weekday) %>%
+  summarize(proportion_age=mean(2024 - birthyear)) %>%
+  ggplot(aes(fill=type, y=proportion_age, x=weekday)) + 
+  geom_bar(position="dodge", stat="identity") +
+  scale_fill_manual("Type",values=c("coral", "cyan4"), labels=c("Representative","Senator")) +
+  scale_x_discrete(limits = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")) +
+  ylab("Average Age") +
+  xlab("Day of the Week")
+
+# mapping FILL aesthetic
 ```
 
 <br/>
