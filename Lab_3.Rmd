@@ -111,7 +111,7 @@ congress %>%
   labs(title="Birthyears of Congress Members") +
   geom_line() +
   geom_point() +
-  scale_colour_manual("Type",values=c("coral", "cyan4"), labels=c("Representative","Senator"))
+  scale_colour_manual("Type",values=scales::brewer_pal(palette = "Set2")(2), labels=c("Representative","Senator"))
 
 
 
@@ -134,7 +134,7 @@ congress %>%
   summarize(proportion_age=mean(2024 - birthyear)) %>%
   ggplot(aes(fill=type, y=proportion_age, x=weekday)) + 
   geom_bar(position="dodge", stat="identity") +
-  scale_fill_manual("Type",values=c("coral", "cyan4"), labels=c("Representative","Senator")) +
+  scale_fill_manual("Type",values=scales::brewer_pal(palette = "Set2")(2), labels=c("Representative","Senator")) +
   scale_x_discrete(limits = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")) +
   ylab("Average Age") +
   xlab("Day of the Week") +
@@ -213,7 +213,7 @@ result <- committees %>%
 ggplot(result, aes(fill=thomas_id, x=reorder(thomas_id, -n), y=n)) +
   geom_bar(stat='identity', position='dodge') +
   scale_fill_manual("Full Committees", 
-                    values=c("coral", "cyan4", "springgreen4", "steelblue", "tomato3"), 
+                    values=scales::brewer_pal(palette = "Set1")(5),
                     breaks = result$thomas_id,
                     labels = result$name) +
   labs(x = "Full Committee", y = "Number of Members", title = "Sizes of 5 Largest Full Congressional Committees")
@@ -233,16 +233,18 @@ average_age <- committees %>%
   summarize(average_age = mean(2024-birthyear)) %>%
   arrange(average_age)
   
-average_age %>%
+head_tail <- average_age %>%
   head(5) %>%
-  bind_rows(tail(average_age, 5)) %>%
-  ggplot(aes(fill=thomas_id, x=reorder(thomas_id, -average_age), y=average_age)) +
+  bind_rows(tail(average_age, 5))
+
+ggplot(head_tail, aes(fill=thomas_id, x=reorder(thomas_id, -average_age), y=average_age)) +
   geom_bar(stat='identity', position='dodge') +
   scale_fill_manual("Full Committees", 
-                      values=c("coral", "cyan4", "springgreen4", "steelblue", "tomato3", "burlywood1", "darkslateblue", "deeppink3", "aquamarine3", "blueviolet"), 
-                      breaks = average_age$thomas_id,
-                      labels = average_age$name) +
-    labs(x = "Full Committee", y = "Average Age", title = "Full Committees with 5 Highest and Lowest Average Ages")
+                      values = scales::brewer_pal(palette = "Set1")(10), 
+                      breaks = head_tail$thomas_id,
+                      labels = head_tail$name) +
+  labs(x = "Full Committee", y = "Average Age", title = "Full Committees with 5 Highest and Lowest Average Ages") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 <br/>

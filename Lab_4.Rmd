@@ -1,0 +1,152 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[**Lab #4 Markdown File**](/assignments/Lab_4.Rmd)
+
+[**Lab Instructions**](https://dssoc.github.io/assignments/lab_instructions.html)
+
+In this lab we will be practicing the fundamentals of programming in R.
+
+See the "Instructions" section of the [Introduction to Lab Assignments](https://dssoc.github.io/assignments/lab_instructions.html) page for more information about the labs. That page also gives descriptions for the datasets we will be using.
+
+**Required reading:**
+
+-   [R4DS Chapters 17-21: Programming](https://r4ds.had.co.nz/program-intro.html)
+
+**Optional resources:**
+
+-   [R for Data Science Chapter 16: Dates and times](https://r4ds.had.co.nz/dates-and-times.html)
+
+```{r message=FALSE, echo=FALSE}
+# Load the datasets and libraries. You shouldn't need to change the URL in the `load` function.
+
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+
+load(url('https://dssoc.github.io/datasets/congress.RData'))
+```
+
+<br/>
+
+## Example Questions
+
+<br>
+
+**ex1. Write a function that accepts a numerical vector and returns a boolean vector indicating whether or not each number is even.**
+
+```{r}
+is_even <- function(nums) {
+  return((nums %% 2)==0)
+}
+
+my_numbers <- c(1, 4, 23, 34, 23, 5, 4, 39)
+
+head(is_even(my_numbers))
+my_numbers %>% is_even() %>% head()# note that this is equivalent if you've loaded dplyr
+```
+
+<br/>
+
+**ex2. Write a function to compute the birth decade from the birthyear of each politician. Then write a function to generate a label for each decade. Use these functions within the mutate function to create new columns in the congress dataframe.**
+
+```{r}
+get_decade <- function(byear) {
+  return(round(byear/10)*10)
+}
+get_decade_label <- function(byear) {
+  return(paste0(round(byear/10), "0's"))
+}
+
+# using functions without mutate
+get_decade(congress$birthyear) %>% head()
+get_decade_label(congress$birthyear) %>% head()
+
+congress %>% 
+  mutate(birthdec=get_decade(birthyear), birthdec_label=get_decade_label(birthyear)) %>% 
+  select(full_name, birthdec, birthdec_label) %>% 
+  head()
+```
+
+<br/>
+
+## Questions
+
+<br>
+
+**1. In your own words, describe what a function is and provide one example of how you might use it in a data science project.**
+
+```         
+A function is a way of abstraction that puts a label on a sequence of code, allowing you to run it multiple times. It can shorten code and significantly increase readability of code. In a data science project, a function could be written to return a summary of data given an input of a specific year.
+```
+
+<br/>
+
+**2. Packages in R can contain many useful functions/commands. If you didn't know what a certain function did, or how it worked, where within RStudio would you look to learn more / see example code? Where would you look outside RStudio?**
+
+```         
+In RStudio, the "Help" tab is a good place to look and search for functions. Outside of RStudio, https://www.rdocumentation.org/ is a good resource.
+```
+
+<br/>
+
+**3. Write a function that takes a character vector as an argument and returns a character vector containing the first 2 letters of each element in the original vector. To show that it works, test it on the character vector `sentence` defined below.**
+
+```{r}
+sentence <- c('you', 'only', 'understand', 'data', 'if', 'data', 'is', 'tidy')
+
+firstTwo <- function(charVector) {
+  result <- c()
+  for (x in charVector) {
+    result <- c(result, substr(x, 1, 2))
+  }
+  return(result)
+}
+
+print(firstTwo(sentence))
+```
+
+<br/>
+
+**4. Create your own function which accepts a birthyear vector and returns an approximate current age, then use it on the `birthyear` column of the `congress` dataframe to create a new `age` column with `mutate`. Then compute the average age of Male and Female congress members.**
+
+Note: functions used inside mutate accept single columns from the original dataframe and should return a column or vector of the same size. This is a valuable tool for developing your data pipelines.
+
+```{r}
+# your answer here
+```
+
+<br/>
+
+**5. Create your own function which accepts a string vector of phone numbers like the `phone` column of `congress_contact` and returns an area code (first three numbers in a phone number), then use it on the `phone` column of the `congress_contact` dataframe to create a new `area` column with `mutate`.**
+
+```{r}
+# your answer here
+```
+
+<br/>
+
+**6. Write a function that accepts a dataframe with the columns `birthdate` and `full_name`, and prints (using the `print` function) the names and ages of the `k` oldest *representatives* in congress (i.e. not including senators) using a "for loop". In this sense, `k` is an arbitrary number that should be given as an argument to the function - set the default value to be 5. If you use the dataframe as the first argument, you can use the pipe operator (`%>%`) to pass the dataframe directly to the function. Define your function such that you can use it like this: `congress %>% print_oldest(3)`.**
+
+```{r}
+# your answer here
+```
+
+<br/>
+
+**7. Starting with the function from the previous question, change it such that if k \> 5, it only prints the first 5 names and ages. Test using this code: `congress %>% print_oldest(100)` (it should print ONLY the first 5 names and ages).**
+
+```{r}
+# your answer here
+# you will define print_oldest
+#congress %>% print_oldest(100)
+```
+
+<br/>
+
+**8. Last week you were asked to come up with two interesting social science research questions you could address with your final project. This week, I'd like you to find at least one potential data source you could analyze (in theory) to answer each of those questions. If you can't find a potential data source, feel free to change your question (but make sure you state it explicitly). In research that uses data science, there is often a tension between the questions you would like to ask and the data that is available. You can formulate a research question by going back and forth between your question and available data.**
+
+```{r}
+# your answer here
+```
