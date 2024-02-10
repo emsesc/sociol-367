@@ -194,6 +194,12 @@ congress %>% print_oldest(100)
 
 **8. Last week you were asked to come up with two interesting social science research questions you could address with your final project. This week, I'd like you to find at least one potential data source you could analyze (in theory) to answer each of those questions. If you can't find a potential data source, feel free to change your question (but make sure you state it explicitly). In research that uses data science, there is often a tension between the questions you would like to ask and the data that is available. You can formulate a research question by going back and forth between your question and available data.**
 
-```{r}
-# your answer here
+```         
+The link below leads to a database of National Park visitor data, organized by year. This is for my potential research question: What factors influence higher visitor rates at National Parks, including monuments and other historical locations?
+https://irma.nps.gov/Stats/Reports/National
+
+Because I couldn't find a public dataset that included national museum visitor data, I thought of another question that I am interested in: What impacts do having a resourceful public library have on rural areas in the United States? The link below leads to a database containing surveys of public libraries in the United States.
+https://www.imls.gov/research-evaluation/data-collection/public-libraries-survey
+
+Sidenote: If I still wanted to pursue answering the museum question, I could find a list of museums in the United States and query the Google Maps API for visitor data and other categorical information.
 ```
