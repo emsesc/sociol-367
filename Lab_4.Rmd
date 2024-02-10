@@ -119,8 +119,10 @@ computeAge <- function(birthyear) {
   return(2024 - birthyear)
 }
 
+congress <- congress |>
+  mutate(age = computeAge(birthyear))
+
 congress |>
-  mutate(age = computeAge(birthyear)) |>
   group_by(gender) |>
   summarise(averageAge = mean(age))
 ```
@@ -130,7 +132,15 @@ congress |>
 **5. Create your own function which accepts a string vector of phone numbers like the `phone` column of `congress_contact` and returns an area code (first three numbers in a phone number), then use it on the `phone` column of the `congress_contact` dataframe to create a new `area` column with `mutate`.**
 
 ```{r}
-# your answer here
+
+areaCode <- function(phoneNums) {
+  return(substr(phoneNums, 1, 3))
+}
+
+congress_contact <- congress_contact |>
+  mutate(area = areaCode(phone))
+
+print(congress_contact)
 ```
 
 <br/>
@@ -138,7 +148,24 @@ congress |>
 **6. Write a function that accepts a dataframe with the columns `birthdate` and `full_name`, and prints (using the `print` function) the names and ages of the `k` oldest *representatives* in congress (i.e. not including senators) using a "for loop". In this sense, `k` is an arbitrary number that should be given as an argument to the function - set the default value to be 5. If you use the dataframe as the first argument, you can use the pipe operator (`%>%`) to pass the dataframe directly to the function. Define your function such that you can use it like this: `congress %>% print_oldest(3)`.**
 
 ```{r}
-# your answer here
+
+print_oldest <- function(congressData, k) {
+  if (is.null(k)) {
+    k <- 5
+  }
+  
+  congressData <- filter(congressData, type == "rep")
+  congressData <- arrange(congressData, birthyear)
+  
+  for (n in 1:k) {
+    name <- congressData$full_name[n]
+    age <- 2024 - congressData$birthyear[n]
+    print("Name: ", name, ", Age: ", age)
+  }
+}
+
+congress |>
+  print_oldest(3)
 ```
 
 <br/>
