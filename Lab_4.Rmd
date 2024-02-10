@@ -140,7 +140,7 @@ areaCode <- function(phoneNums) {
 congress_contact <- congress_contact |>
   mutate(area = areaCode(phone))
 
-print(congress_contact)
+congress_contact |> head()
 ```
 
 <br/>
