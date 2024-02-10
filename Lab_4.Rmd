@@ -149,18 +149,14 @@ print(congress_contact)
 
 ```{r}
 
-print_oldest <- function(congressData, k) {
-  if (is.null(k)) {
-    k <- 5
-  }
-  
+print_oldest <- function(congressData, k = 5) {
   congressData <- filter(congressData, type == "rep")
   congressData <- arrange(congressData, birthyear)
   
   for (n in 1:k) {
     name <- congressData$full_name[n]
-    age <- 2024 - congressData$birthyear[n]
-    print("Name: ", name, ", Age: ", age)
+    age <- 2024 - strtoi(congressData$birthyear[n])
+    print(paste0("Name: ", name, ", Age: ", age))
   }
 }
 
@@ -175,7 +171,23 @@ congress |>
 ```{r}
 # your answer here
 # you will define print_oldest
-#congress %>% print_oldest(100)
+
+print_oldest <- function(congressData, k = 5) {
+  if (k > 5) {
+    k = 5
+  }
+  
+  congressData <- filter(congressData, type == "rep")
+  congressData <- arrange(congressData, birthyear)
+  
+  for (n in 1:k) {
+    name <- congressData$full_name[n]
+    age <- 2024 - strtoi(congressData$birthyear[n])
+    print(paste0("Name: ", name, ", Age: ", age))
+  }
+}
+
+congress %>% print_oldest(100)
 ```
 
 <br/>
