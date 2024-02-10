@@ -114,7 +114,15 @@ print(firstTwo(sentence))
 Note: functions used inside mutate accept single columns from the original dataframe and should return a column or vector of the same size. This is a valuable tool for developing your data pipelines.
 
 ```{r}
-# your answer here
+
+computeAge <- function(birthyear) {
+  return(2024 - birthyear)
+}
+
+congress |>
+  mutate(age = computeAge(birthyear)) |>
+  group_by(gender) |>
+  summarise(averageAge = mean(age))
 ```
 
 <br/>
