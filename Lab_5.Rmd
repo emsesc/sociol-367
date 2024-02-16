@@ -1,0 +1,303 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[**Lab #5 Markdown File**](/assignments/Lab_5.Rmd)
+
+[**Lab Instructions**](https://dssoc.github.io/assignments/lab_instructions.html)
+
+In this lab we will be practicing the fundamentals of network analysis.
+
+See the "Instructions" section of the [Introduction to Lab Assignments](https://dssoc.github.io/assignments/lab_instructions.html) page for more information about the labs. That page also gives descriptions for the datasets we will be using.
+
+**Required reading:**
+
+Theoretical:
+
+-   Chapter 3: Integrated Network Analysis Tutorial (see Slack)
+-   [Social Network Analysis Wikipedia](https://en.wikipedia.org/wiki/Social_network_analysis)
+-   [Network Centrality Measures on Wikipedia](https://en.wikipedia.org/wiki/Centrality)
+-   [Using Metadata to find Paul Revere](https://kieranhealy.org/blog/archives/2013/06/09/using-metadata-to-find-paul-revere/)
+
+Practical:
+
+-   [R igraph Manual Pages](https://igraph.org/r/doc/aaa-igraph-package.html)
+-   [Official documentation for `ggraph` package](https://cran.r-project.org/web/packages/ggraph/ggraph.pdf)
+
+**Optional resources:**
+
+-   [Official documentation for `igraph` package](https://igraph.org/r/doc/)
+-   [Official documentation for `ggraph` package](https://cran.r-project.org/web/packages/ggraph/ggraph.pdf)
+-   [Introduction to `ggraph` layouts](https://www.data-imaginist.com/2017/ggraph-introduction-layouts/)
+-   [Intro to Network Analysis with R, by Jesse Sadle](https://www.jessesadler.com/post/network-analysis-with-r/).
+-   [Network analysis with R and igraph: NetSci X Tutorial (Parts 2-7), by Katya Ognyanova](https://kateto.net/networks-r-igraph)
+-   [R4DS Chapters 17-21: Programming](https://r4ds.had.co.nz/program-intro.html)
+-   [Bipartite/Two-Mode Networks in igraph by Phil Murphy & Brendan Knapp](https://rpubs.com/pjmurphy/317838): specifically, the sections "Loading and configuring two-mode data" and "Another way to produce an overlap count in igraph bipartite_projection()".
+-   [Bipartite Graph Wikipedia](https://en.wikipedia.org/wiki/Bipartite_graph)
+
+```{r message=FALSE, echo=FALSE}
+# Load the datasets and libraries. You shouldn't need to change the URL in the `load` function.
+
+library(tidyverse)
+library(ggplot2)
+library(ggraph)
+library(igraph)
+
+
+load(url('https://dssoc.github.io/datasets/committees.RData'))
+load(url('https://dssoc.github.io/datasets/congress.RData'))
+
+
+############# RUN THIS CODE TO GET common_committees #############
+# YOU CAN IGNORE THIS CODE - I JUST INCLUDED IT IN CASE YOU ARE CURIOUS
+
+get_committee_comemberships <- function(cong, subcomm, memberships) {
+  # you can ignore this function if you want - just setting up the lab.
+  # Gets the number of common committees that each pair of congress 
+  # members belong to.
+  
+  # get subcommittees only
+  subcommittee_memberships <- subcomm %>% 
+    inner_join(memberships, by = "thomas_id")
+  
+  # create graph from subcommittee memberships
+  g <- subcommittee_memberships %>% select(thomas_id, bioguide_id) %>% graph_from_data_frame(directed=FALSE)
+  V(g)$type <- bipartite_mapping(g)$type
+  
+  # use bipartite projection to get number of shared committee memberships between
+  # each pair of congress members
+  h <- g %>% bipartite_projection(which=TRUE)
+  V(h) %>% length()
+  E(h) %>% length()
+  
+  # remove vertices that are not in congress
+  rm_vs <- V(h)[!V(h)$name %in% cong$bioguide_id]
+  rm_vs %>% length()
+  h <- h %>% delete_vertices(V(h)[!V(h)$name %in% cong$bioguide_id])
+  V(h) %>% length()
+  E(h) %>% length()
+  
+  common_committees <- h %>% igraph::as_data_frame(what="edges") %>% 
+    select(from, to, common_subcomm=weight)
+  common_committees %>% nrow()
+  return(common_committees)
+}
+
+common_subcomm <- get_committee_comemberships(congress, subcommittees, committee_memberships)
+```
+
+<br/>
+
+## Lab Dataset
+
+For most of this lab we will use the `common_subcomm` data frame in addition to our other data sets. This dataset lists the number of common subcommittees that each pair of congress members is on. Note that the "from" and "to" columns correspond to the `bioguide_id` of congress members, and `common_subcomm` is the number of common committees they are on.
+
+```{r}
+common_subcomm %>% head()
+common_subcomm %>% summary()
+```
+
+## Example Questions
+
+<br>
+
+**ex1. Create an `igraph` graph from the data frame `common_committees`, and print the number of vertices and edges it has.**
+
+```{r}
+g <- common_subcomm %>% graph_from_data_frame()
+V(g) %>% length()
+E(g) %>% length()
+```
+
+<br/>
+
+**ex2. Create an `igraph` graph where edges only exist between congress members on at least 3 committees together. Output the number of edges that result.**
+
+```{r}
+# two ways to do this: filter before creating graph, or filter edges using igraph
+
+# solution 1: filter before crreating graph
+g <- common_subcomm %>% 
+  filter(common_subcomm >= 3) %>% 
+  graph_from_data_frame()
+
+# solution 2: filter edges using igraph
+h <- common_subcomm %>% graph_from_data_frame()
+edges_to_remove <- E(h)[E(h)$common_subcomm < 3]
+h <- h %>% delete_edges(edges_to_remove)
+
+E(g) %>% length()
+E(h) %>% length()
+#node_attr <- congress %>% filter(bioguide_id %in% V(g))
+#g %>% set_vertex_attr('full_name', index=node_attr$bioguide_id, value=node_attr$full_name)
+```
+
+<br/>
+
+**ex3. make a simple visualization of the previous network using ggraph.**
+
+```{r}
+g <- common_subcomm %>% 
+  filter(common_subcomm >= 3) %>% 
+  graph_from_data_frame()
+
+g %>% ggraph() +
+  geom_edge_link(aes(alpha=common_subcomm)) +
+  geom_node_point()
+```
+
+<br/>
+
+**ex4. make a network that includes only senators, not representatives.**
+
+```{r}
+# two fine ways to do this - filter the dataframe before making the graph, or 
+# remove nodes after creating the graph
+
+##################### solution 1 - filter dataframe first #####################
+senators <- (congress %>% filter(type=='sen'))$bioguide_id
+g <- common_subcomm %>% 
+  filter((to %in% senators) & (from %in% senators)) %>% 
+  graph_from_data_frame()
+
+V(g) %>% length()
+E(g) %>% length()
+
+##################### solution 2 - filter in graph #####################
+
+# get ids of node set
+node_ids <- c(common_subcomm$from, common_subcomm$to) %>% unique()
+
+# get only rows of congress that are in the network - this will be used as node data
+node_data <- congress %>% filter(bioguide_id %in% node_ids)
+
+########### graph creation method 1: use the vertices argument in graph_from_data_frame to add all the vertex info
+# this works because the first column of node_data is the bioguide_id.
+h1 <- common_subcomm %>% 
+  graph_from_data_frame(vertices=node_data)
+
+########### graph creation method 2: use set_vertex_attr to add the specific attribute to the graph after creating it
+h2 <- common_subcomm %>% 
+  graph_from_data_frame()
+h2 <- h2 %>% set_vertex_attr('type', index=node_data$bioguide_id, value=node_data$type)
+
+# h1, h2 should the be the same
+print(paste(gsize(h1), gsize(h2), gorder(h1), gorder(h2)))
+
+# filter out actual nodes
+vertices_to_remove <- V(h1)[V(h1)$type!='sen']
+h1 <- h1 %>% delete_vertices(vertices_to_remove)
+
+# same as in solution 1
+V(h1) %>% length()
+E(h1) %>% length()
+
+```
+
+<br/>
+
+## Questions
+
+<br>
+
+**1. Describe the following concepts using the suggested readings or by searching on the web:**
+
+```         
+Basic Elements of Networks
+  nodes (also called "vertices"): Points that can have attributes  that can be connected by edges.
+  edges (also called "ties" or "links"): Connections between nodes that can have a attributes such as a weighted value.
+
+Network Representations
+  edge list: List of edges that shows how 
+  adjacency matrix: A matrix with 0's and 1's or weighted values if the corresponding row and column nodes have a connecting edge.
+
+Types of networks
+  directed vs undirected network: A directed network has arrows that represent a direction of connection between nodes, while an undirected network has edges without direction.
+  weighted vs unweighted network: A weighted network has an attribute for "weight" on its edges, whereas an unweighted network does not.
+```
+
+<br/>
+
+**2. Using resources in the suggested readings and on the web, describe three different centrality measures that can be used to summarize the positions of specific nodes/vertices within a network: betweenness centrality, strength centrality, and eigenvector centrality. Give an example use case for each of these measures.**
+
+HINT: see required reading about centrality measures on Wikipedia to get some ideas.
+
+```         
+1. 
+2. 
+3. 
+```
+
+<br/>
+
+**3. Describe the behavior of the following functions, including their outputs and the behavior of each argument/parameter.**
+
+```         
+graph_from_data_frame: 
+graph_from_edgelist: 
+
+E(): 
+V(): 
+
+strength: 
+betweenness: 
+```
+
+<br/>
+
+**4. Examine the `common_subcomm` dataframe. Would we consider this as an adjacency matrix or edge list network representation? Is the network that can be constructed from this dataframe weighted/unweighted or directed/undirected? Use your substantive understanding of the data to answer these questions.**
+
+```         
+Adjacency Matrix or Edge List?: 
+weighted/unweighted?: 
+directed/undirected?: 
+```
+
+<br/>
+
+**5. Create a visualization showing a network of senators (NOT representatives) where edges exist only between those senators that are on at least three subcommittees. Set node color based on the gender of the senators. Do you see any patterns visually?**
+
+HINT: see the example questions for some ideas of how to accomplish this.
+
+```{r}
+# Your answer here.
+```
+
+<br/>
+
+**6. Find the average betweenness centrality (ignoring edge weights) of (ONLY) senators by gender after filtering edges that don't have at least three common subcommittees.**
+
+HINT: see `as_data_frame` for creating dataframes from node or edge attributes.
+
+```{r}
+```
+
+<br/>
+
+**7. Compute the correlation between birthyear and betweenness centrality (ignoring edge weights) of senators, filtering for edges with fewer than three common subcommittees. What can you conclude from the sign (positive or negative) of this result?**
+
+```{r}
+# Your answer here
+```
+
+<br/>
+
+**8. Compare the average shortest path length for senator and representative networks after filtering for edges where congress members are on at least three common committees. Why are they different?**
+
+```{r}
+# your answer here
+```
+
+```         
+Why are they different?
+```
+
+<br/>
+
+**9. In last week's lab exercise, you were asked to identify several possible datasets you could use for your final project. Now write two specific data science research questions and describe variables in that dataset that could allow you to answer the questions.**
+
+HINT: **What is a good research question?** A good data science research question specifies a relationship between two or more variables that you can measure. The question "why did the chicken cross the road?" is not a good research question because it does not explicitly describe the relationship between any variables. The question "do chickens cross the road more frequently than raccoons?" is good because it specifies a relationship between the type of animal (chickens and raccoons) and the frequency with which the animal crosses the road. Your question should be answerable given the specific variables available in your dataset.
+
+```         
+# your answer here
+```
