@@ -260,7 +260,19 @@ directed/undirected?:
 HINT: see the example questions for some ideas of how to accomplish this.
 
 ```{r}
-# Your answer here.
+senators <- (congress %>% filter(type=='sen'))
+senate_net <- common_subcomm %>% 
+  filter((to %in% senators$bioguide_id) & (from %in% senators$bioguide_id)) %>% 
+  filter(common_subcomm >= 3) %>% 
+  graph_from_data_frame(vertices=senators)
+
+V(senate_net)$color_party<-ifelse(V(senate_net)$gender=="F", "green", "purple")
+
+ggraph(senate_net, layout="kk") +
+	geom_node_point(color=V(senate_net)$color_party) +
+	geom_edge_link(width=.01) +
+	theme_void() +
+	geom_node_text(aes(label=full_name), size=2)
 ```
 
 <br/>
