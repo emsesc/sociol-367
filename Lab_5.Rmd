@@ -248,9 +248,9 @@ betweenness:
 **4. Examine the `common_subcomm` dataframe. Would we consider this as an adjacency matrix or edge list network representation? Is the network that can be constructed from this dataframe weighted/unweighted or directed/undirected? Use your substantive understanding of the data to answer these questions.**
 
 ```         
-Adjacency Matrix or Edge List?: 
-weighted/unweighted?: 
-directed/undirected?: 
+Adjacency Matrix or Edge List?: Edge List
+weighted/unweighted?: Weighted
+directed/undirected?: Undirected
 ```
 
 <br/>
@@ -270,7 +270,7 @@ V(senate_net)$color_party<-ifelse(V(senate_net)$gender=="F", "green", "purple")
 
 ggraph(senate_net, layout="kk") +
 	geom_node_point(color=V(senate_net)$color_party) +
-	geom_edge_link(width=.01) +
+	geom_edge_link(width=.05) +
 	theme_void() +
 	geom_node_text(aes(label=full_name), size=2)
 ```
@@ -282,6 +282,22 @@ ggraph(senate_net, layout="kk") +
 HINT: see `as_data_frame` for creating dataframes from node or edge attributes.
 
 ```{r}
+senators <- (congress %>% filter(type=='sen'))
+senate_net <- common_subcomm %>% 
+  filter((to %in% senators$bioguide_id) & (from %in% senators$bioguide_id)) %>% 
+  filter(common_subcomm >= 3) %>% 
+  graph_from_data_frame(vertices=senators)
+
+centrality_score <- as.data.frame(betweenness(senate_net)) %>%
+  rownames_to_column(var = "bioguide_id") %>%
+  inner_join(senators, by = "bioguide_id")
+
+colnames(centrality_score)[1] <- "score"
+
+centrality_score %>%
+  group_by(gender) %>%
+  summarise(average_betweenness_centrality=mean(score))
+  
 ```
 
 <br/>
