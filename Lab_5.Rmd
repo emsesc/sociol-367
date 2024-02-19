@@ -292,7 +292,7 @@ centrality_score <- as.data.frame(betweenness(senate_net)) %>%
   rownames_to_column(var = "bioguide_id") %>%
   inner_join(senators, by = "bioguide_id")
 
-colnames(centrality_score)[1] <- "score"
+colnames(centrality_score)[2] <- "score"
 
 centrality_score %>%
   group_by(gender) %>%
@@ -305,7 +305,19 @@ centrality_score %>%
 **7. Compute the correlation between birthyear and betweenness centrality (ignoring edge weights) of senators, filtering for edges with fewer than three common subcommittees. What can you conclude from the sign (positive or negative) of this result?**
 
 ```{r}
-# Your answer here
+senators <- (congress %>% filter(type=='sen'))
+senate_net <- common_subcomm %>% 
+  filter((to %in% senators$bioguide_id) & (from %in% senators$bioguide_id)) %>% 
+  filter(common_subcomm >= 3) %>% 
+  graph_from_data_frame(vertices=senators)
+
+centrality_score <- as.data.frame(betweenness(senate_net)) %>%
+  rownames_to_column(var = "bioguide_id") %>%
+  inner_join(senators, by = "bioguide_id")
+
+colnames(centrality_score)[2] <- "score"
+
+cor(centrality_score$birthyear, centrality_score$score)
 ```
 
 <br/>
@@ -313,7 +325,21 @@ centrality_score %>%
 **8. Compare the average shortest path length for senator and representative networks after filtering for edges where congress members are on at least three common committees. Why are they different?**
 
 ```{r}
-# your answer here
+senators <- (congress %>% filter(type=='sen'))
+senate_net <- common_subcomm %>% 
+  filter((to %in% senators$bioguide_id) & (from %in% senators$bioguide_id)) %>% 
+  filter(common_subcomm >= 3) %>% 
+  graph_from_data_frame(vertices=senators)
+
+average_shortest_path_length <- average.path.length(senate_net)
+
+reprsentatives <- (congress %>% filter(type=='rep'))
+rep_net <- common_subcomm %>% 
+  filter((to %in% representatives$bioguide_id) & (from %in% representatives$bioguide_id)) %>% 
+  filter(common_subcomm >= 3) %>% 
+  graph_from_data_frame(vertices=representatives)
+
+average_shortest_path_length <- average.path.length(rep_net)
 ```
 
 ```         
