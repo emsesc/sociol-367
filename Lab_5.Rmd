@@ -282,8 +282,6 @@ senate_net %>%
 	geom_edge_link(width=.05) +
 	theme_void() +
   labs(fill = c("Female", "Male"), title = "Network of Senators on at Least Three Subcommittees")
-
-# ADD LEGEND
 ```
 
 <br/>
@@ -349,7 +347,7 @@ senate_data <- senators %>%
 
 senate_net <- graph_from_data_frame(senate_net, directed=FALSE, vertices=senate_data)
 
-print(paste("Senate Average Shortest Path Length:", average.path.length(senate_net)))
+print(paste("Senate Average Shortest Path Length:", mean_distance(senate_net)))
 
 # representatives
 
@@ -366,7 +364,7 @@ rep_data <- representatives %>%
 
 rep_net <- graph_from_data_frame(rep_net, directed=FALSE, vertices=rep_data)
 
-print(paste("Representatives Average Shortest Path Length:", average.path.length(rep_net)))
+print(paste("Representatives Average Shortest Path Length:", mean_distance(rep_net)))
 ```
 
 ```         
@@ -382,5 +380,23 @@ Because there are more US representatives than US senators, the average shortest
 HINT: **What is a good research question?** A good data science research question specifies a relationship between two or more variables that you can measure. The question "why did the chicken cross the road?" is not a good research question because it does not explicitly describe the relationship between any variables. The question "do chickens cross the road more frequently than raccoons?" is good because it specifies a relationship between the type of animal (chickens and raccoons) and the frequency with which the animal crosses the road. Your question should be answerable given the specific variables available in your dataset.
 
 ```         
-# your answer here
+Research Question 1:
+How has social media impacted the visitor rates of National Parks?
+
+https://irma.nps.gov/Stats/Reports/National
+Variables:
+- Number of visitors
+- Variable analysis of network of National Park Instagram accounts
+- Analysis of number of posts located at a National Park
+
+Research Question 2:
+How big of an impact do public libraries have on rural areas?
+
+https://www.imls.gov/research-evaluation/data-collection/public-libraries-survey
+Variables:
+- Filter by rural areas
+- Public computer usage (compared to number of households with computers from US Census)
+- Attendance at programs
+- Library visits
+- Internet Access (compared to number of households with internet access from US Census)
 ```
