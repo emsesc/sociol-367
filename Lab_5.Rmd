@@ -235,14 +235,14 @@ HINT: see required reading about centrality measures on Wikipedia to get some id
 **3. Describe the behavior of the following functions, including their outputs and the behavior of each argument/parameter.**
 
 ```         
-graph_from_data_frame: This function takes a dataframe as the first input, a dataframe containing vertice data, and whether 
-graph_from_edgelist: 
+graph_from_data_frame: This function takes a dataframe as the first input, a dataframe containing vertice data, and whether the graph is directed. It outputs an igraph graph that can be used to create a visualization.
+graph_from_edgelist: This function takes in a edge list, which has an edge in each row. It also takes a parameter that determines whether the graph is directed.
 
-E(): 
-V(): 
+E(): This function takes in a graph object, a list of vertices to identify specific edges (p), a list of vertices to identify a path (path), and whether to use edge directions in (p) (directed) to output a the edges of a graph
+V(): This function takes in a graph object and outputs a sequence of vertexes.
 
-strength: 
-betweenness: 
+strength: This function takes in a graph, vertices for strength calculation (vids), which mode to calculuate degrees of vertices (mode), whether to count in loops (loops), and what weight vector to use (weights). It then returns the strength of the vertices (the sum of weights).
+betweenness: This function takes in a graph, a list of vertices for calculation, whether the graph is directed, weights for edges, whether the score should be normalized, a list of edges for calculation, and the maximum path length for consideration. It then returns a score of betweenness centrality as calculuated by the number of shortest paths going through a vertex or edge.
 ```
 
 <br/>
