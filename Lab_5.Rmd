@@ -204,15 +204,15 @@ E(h1) %>% length()
 
 ```         
 Basic Elements of Networks
-  nodes (also called "vertices"): Points that can have attributes  that can be connected by edges.
+  nodes (also called "vertices"): Points that can have attributes that can be connected by edges.
   edges (also called "ties" or "links"): Connections between nodes that can have a attributes such as a weighted value.
 
 Network Representations
-  edge list: List of edges that shows how 
+  edge list: List of edges that shows how nodes are connected. Each edge on the list has a starting and ending node connection, and it can have a weight attribute.
   adjacency matrix: A matrix with 0's and 1's or weighted values if the corresponding row and column nodes have a connecting edge.
 
 Types of networks
-  directed vs undirected network: A directed network has arrows that represent a direction of connection between nodes, while an undirected network has edges without direction.
+  directed vs undirected network: A directed network has edges that represent a direction (from, to) of connection between nodes, while an undirected network has edges without direction.
   weighted vs unweighted network: A weighted network has an attribute for "weight" on its edges, whereas an unweighted network does not.
 ```
 
@@ -223,9 +223,11 @@ Types of networks
 HINT: see required reading about centrality measures on Wikipedia to get some ideas.
 
 ```         
-1. 
-2. 
-3. 
+1. Betweenness Centrality: This is a quantification of the number of times a node is used as part of the shortest path between two other nodes. A use case is using it to determine which person in a network has the most control over the communication of information.
+
+2. Strength Centrality: This is a quantification of how "strong" a node's connections are, that is, the sum of a node's edge weights. A use case is determining who has the most influence in a social network, where edges are more heavily weighted if they are stronger connections.
+
+3. Eigenvector Centrality: This is a quantification of how much influence a node has in a network, which is calculated through giving a node a higher score if they are connected to nodes with higher scores. Therefore, nodes connected with more higher scoring nodes have higher scores. This can be applied to citation networks, where papers cited by highly scored papers are likely to have more influence in the scientific field.
 ```
 
 <br/>
@@ -233,7 +235,7 @@ HINT: see required reading about centrality measures on Wikipedia to get some id
 **3. Describe the behavior of the following functions, including their outputs and the behavior of each argument/parameter.**
 
 ```         
-graph_from_data_frame: 
+graph_from_data_frame: This function takes a dataframe as the first input, a dataframe containing vertice data, and whether 
 graph_from_edgelist: 
 
 E(): 
@@ -261,18 +263,27 @@ HINT: see the example questions for some ideas of how to accomplish this.
 
 ```{r}
 senators <- (congress %>% filter(type=='sen'))
+
 senate_net <- common_subcomm %>% 
   filter((to %in% senators$bioguide_id) & (from %in% senators$bioguide_id)) %>% 
-  filter(common_subcomm >= 3) %>% 
-  graph_from_data_frame(vertices=senators)
+  filter(common_subcomm >= 3)
 
-V(senate_net)$color_party<-ifelse(V(senate_net)$gender=="F", "green", "purple")
+senate_ids <- c(senate_net$from, senate_net$to) %>%
+  unique()
+senate_data <- senators %>%
+  filter(bioguide_id %in% senate_ids)
+# senators must be filtered to create a vertices list
 
-ggraph(senate_net, layout="kk") +
-	geom_node_point(color=V(senate_net)$color_party) +
+senate_net %>% 
+  graph_from_data_frame(directed=FALSE, vertices=senate_data) %>%
+  ggraph() +
+  scale_color_manual(labels = c("Female", "Male"), values = c("yellow", "purple")) +
+	geom_node_point(aes(color=gender)) +
 	geom_edge_link(width=.05) +
 	theme_void() +
-	geom_node_text(aes(label=full_name), size=2)
+  labs(fill = c("Female", "Male"), title = "Network of Senators on at Least Three Subcommittees")
+
+# ADD LEGEND
 ```
 
 <br/>
@@ -285,14 +296,21 @@ HINT: see `as_data_frame` for creating dataframes from node or edge attributes.
 senators <- (congress %>% filter(type=='sen'))
 senate_net <- common_subcomm %>% 
   filter((to %in% senators$bioguide_id) & (from %in% senators$bioguide_id)) %>% 
-  filter(common_subcomm >= 3) %>% 
-  graph_from_data_frame(vertices=senators)
+  filter(common_subcomm < 3)
+# don't have at least 3 subcommittees
+
+senate_ids <- c(senate_net$from, senate_net$to) %>%
+  unique()
+senate_data <- senators %>%
+  filter(bioguide_id %in% senate_ids)
+
+senate_net <- senate_net %>%
+  graph_from_data_frame(directed=FALSE, vertices=senate_data)
 
 centrality_score <- as.data.frame(betweenness(senate_net)) %>%
   rownames_to_column(var = "bioguide_id") %>%
-  inner_join(senators, by = "bioguide_id")
-
-colnames(centrality_score)[2] <- "score"
+  inner_join(senate_data, by = "bioguide_id") %>%
+  rename(score = `betweenness(senate_net)`)
 
 centrality_score %>%
   group_by(gender) %>%
@@ -305,19 +323,11 @@ centrality_score %>%
 **7. Compute the correlation between birthyear and betweenness centrality (ignoring edge weights) of senators, filtering for edges with fewer than three common subcommittees. What can you conclude from the sign (positive or negative) of this result?**
 
 ```{r}
-senators <- (congress %>% filter(type=='sen'))
-senate_net <- common_subcomm %>% 
-  filter((to %in% senators$bioguide_id) & (from %in% senators$bioguide_id)) %>% 
-  filter(common_subcomm >= 3) %>% 
-  graph_from_data_frame(vertices=senators)
-
-centrality_score <- as.data.frame(betweenness(senate_net)) %>%
-  rownames_to_column(var = "bioguide_id") %>%
-  inner_join(senators, by = "bioguide_id")
-
-colnames(centrality_score)[2] <- "score"
-
 cor(centrality_score$birthyear, centrality_score$score)
+```
+
+```         
+Because the correlation is positive, the younger the senator, the higher the centrality score. It can then be concluded that the younger senators are correlated with more control over the flow of information in the network. 
 ```
 
 <br/>
@@ -325,25 +335,44 @@ cor(centrality_score$birthyear, centrality_score$score)
 **8. Compare the average shortest path length for senator and representative networks after filtering for edges where congress members are on at least three common committees. Why are they different?**
 
 ```{r}
+# senators
 senators <- (congress %>% filter(type=='sen'))
+
 senate_net <- common_subcomm %>% 
   filter((to %in% senators$bioguide_id) & (from %in% senators$bioguide_id)) %>% 
-  filter(common_subcomm >= 3) %>% 
-  graph_from_data_frame(vertices=senators)
+  filter(common_subcomm >= 3)
 
-average_shortest_path_length <- average.path.length(senate_net)
+senate_ids <- c(senate_net$from, senate_net$to) %>%
+  unique()
+senate_data <- senators %>%
+  filter(bioguide_id %in% senate_ids)
 
-reprsentatives <- (congress %>% filter(type=='rep'))
+senate_net <- graph_from_data_frame(senate_net, directed=FALSE, vertices=senate_data)
+
+print(paste("Senate Average Shortest Path Length:", average.path.length(senate_net)))
+
+# representatives
+
+representatives <- (congress %>% filter(type=='rep'))
+
 rep_net <- common_subcomm %>% 
   filter((to %in% representatives$bioguide_id) & (from %in% representatives$bioguide_id)) %>% 
-  filter(common_subcomm >= 3) %>% 
-  graph_from_data_frame(vertices=representatives)
+  filter(common_subcomm >= 3)
 
-average_shortest_path_length <- average.path.length(rep_net)
+rep_ids <- c(rep_net$from, rep_net$to) %>%
+  unique()
+rep_data <- representatives %>%
+  filter(bioguide_id %in% rep_ids)
+
+rep_net <- graph_from_data_frame(rep_net, directed=FALSE, vertices=rep_data)
+
+print(paste("Representatives Average Shortest Path Length:", average.path.length(rep_net)))
 ```
 
 ```         
 Why are they different?
+
+Because there are more US representatives than US senators, the average shortest path to get from one node to another would be greater (there are more people, more connections, and therefore longer paths).
 ```
 
 <br/>
