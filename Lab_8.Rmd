@@ -160,7 +160,7 @@ HINT: see the `gsub` or `str_replace_all` functions.
 # identifying urls
 url_pattern <- "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 
-# identifying hashtags
+# identifying hashtags 
 hashtag_pattern <- "#\\S+"
 
 senator_tweet_sample <- senator_tweet_sample %>%
@@ -174,7 +174,23 @@ senator_tweet_sample <- senator_tweet_sample %>%
 Hint: look at the tidytext docs for `unnest_tokens`.
 
 ```{r}
-# your solution here
+# ten most common words
+words <- senator_tweet_sample %>%
+  unnest_tokens(word, cleaned) %>%
+  count(word) %>%
+  arrange(desc(n))
+
+words %>%
+  head(10)
+
+# ten most common words
+data(stop_words)
+
+cleaned_words <- words %>%
+  anti_join(stop_words)
+
+cleaned_words %>%
+  head(10)
 ```
 
 <br/>
