@@ -200,7 +200,11 @@ cleaned_words %>%
 HINT: you might want to check out the `cast_dtm` function.
 
 ```{r}
-# your solution here
+# way 1
+tweet_corpus <- Corpus(VectorSource(as.vector(senator_tweet_sample$cleaned)))
+tweet_corpus <- DocumentTermMatrix(tweet_corpus)
+
+inspect(tweet_corpus)
 ```
 
 <br/>
@@ -208,7 +212,7 @@ HINT: you might want to check out the `cast_dtm` function.
 **7. How could you potentially use text analysis in the final project you have been working on? (You don't necessarily need to do it for the project, just think hypothetically).**
 
 ```         
-response
+If I end up incorporating the Goodreads API into my analysis of book bans, I could obtain a list of reviews of books that have been banned to determine how often people discuss book banning when they review books. This could provide interesting insight into how often people use reading banned books as a way of activism to fight against book banning.
 ```
 
 <br/>
