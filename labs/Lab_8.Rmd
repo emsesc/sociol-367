@@ -97,11 +97,11 @@ Hint: be wary of how R specifically interprets regex strings. It might be helpfu
 ex <- "BREAKING NEWS - @brumleader urges everyone to do their bit in order to tackle the threat posed by rising coronavirus case numbers in city. Full statement here:\n\nhttps://t.co/3tbc6xcRFP\n\n#KeepBrumSafe\n#Btogether\n#COVID19\n#Coronavirus https://t.co/mo5bPUgGgC"
 
 # identifying urls
-url_pattern <- "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+url_pattern <- "(https?://|www\\.)\\S+"
 ex %>% str_view(url_pattern)
 
 # identifying hashtags
-hashtag_pattern <- "#\\S+"
+hashtag_pattern <- "#[A-Za-z0-9_]+"
 ex %>% str_view(hashtag_pattern)
 
 ```
@@ -114,10 +114,10 @@ HINT: see the `str_count` function.
 
 ```{r}
 # identifying urls
-url_pattern <- "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+url_pattern <- "(https?://|www\\.)\\S+"
 
 # identifying hashtags
-hashtag_pattern <- "#\\S+"
+hashtag_pattern <- "#[A-Za-z0-9_]+"
 
 senator_tweet_sample <- senator_tweet_sample %>%
   mutate(n_link = str_count(text, url_pattern),
@@ -138,7 +138,8 @@ Both of the p-values for n_link and n_ht are greater than 0.05, so neither of th
 HINT: try using `str_extract_all` in conjunction with `unnest` (not `unnest_tokens`) to extract the hashtags. This [Stack Overflow solution](https://stackoverflow.com/questions/57854124/str-extract-all-returns-a-list-but-i-want-a-column-in-a-dataframe) may be helpful.
 
 ```{r}
-hashtag_pattern <- "#\\S+"
+# identifying hashtags
+hashtag_pattern <- "#[A-Za-z0-9_]+"
 
 senator_tweet_hashtags <- senator_tweet_sample %>% 
   mutate(hashtags = str_extract_all(text, hashtag_pattern)) %>%
@@ -158,10 +159,10 @@ HINT: see the `gsub` or `str_replace_all` functions.
 
 ```{r}
 # identifying urls
-url_pattern <- "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+url_pattern <- "(https?://|www\\.)\\S+"
 
-# identifying hashtags 
-hashtag_pattern <- "#\\S+"
+# identifying hashtags
+hashtag_pattern <- "#[A-Za-z0-9_]+"
 
 senator_tweet_sample <- senator_tweet_sample %>%
   mutate(cleaned = str_replace_all(text, paste0(url_pattern, "|", hashtag_pattern), ""))
@@ -187,7 +188,8 @@ words %>%
 data(stop_words)
 
 cleaned_words <- words %>%
-  anti_join(stop_words)
+  anti_join(stop_words) %>%
+  filter(word != "amp")
 
 cleaned_words %>%
   head(10)
