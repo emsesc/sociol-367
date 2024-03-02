@@ -157,7 +157,14 @@ head(senator_tweet_hashtags, 5)
 HINT: see the `gsub` or `str_replace_all` functions.
 
 ```{r}
-# your solution here
+# identifying urls
+url_pattern <- "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+
+# identifying hashtags
+hashtag_pattern <- "#\\S+"
+
+senator_tweet_sample <- senator_tweet_sample %>%
+  mutate(cleaned = str_replace_all(text, paste0(url_pattern, "|", hashtag_pattern), ""))
 ```
 
 <br/>
