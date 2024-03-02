@@ -94,7 +94,6 @@ Hint: You should not need to learn regex in any detail to complete this problem.
 Hint: be wary of how R specifically interprets regex strings. It might be helpful to look for regex strings specifically written for R.
 
 ```{r}
-
 ex <- "BREAKING NEWS - @brumleader urges everyone to do their bit in order to tackle the threat posed by rising coronavirus case numbers in city. Full statement here:\n\nhttps://t.co/3tbc6xcRFP\n\n#KeepBrumSafe\n#Btogether\n#COVID19\n#Coronavirus https://t.co/mo5bPUgGgC"
 
 # identifying urls
@@ -105,7 +104,6 @@ ex %>% str_view(url_pattern)
 hashtag_pattern <- "#\\S+"
 ex %>% str_view(hashtag_pattern)
 
-# your solution here
 ```
 
 <br/>
@@ -115,7 +113,6 @@ ex %>% str_view(hashtag_pattern)
 HINT: see the `str_count` function.
 
 ```{r}
-# your solution here
 # identifying urls
 url_pattern <- "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 
@@ -131,7 +128,7 @@ summary(model)
 ```
 
 ```         
-written response here
+Both of the p-values for n_link and n_ht are greater than 0.05, so neither of the predictors were statistically significant.
 ```
 
 <br/>
@@ -141,7 +138,16 @@ written response here
 HINT: try using `str_extract_all` in conjunction with `unnest` (not `unnest_tokens`) to extract the hashtags. This [Stack Overflow solution](https://stackoverflow.com/questions/57854124/str-extract-all-returns-a-list-but-i-want-a-column-in-a-dataframe) may be helpful.
 
 ```{r}
-# your solution here
+hashtag_pattern <- "#\\S+"
+
+senator_tweet_hashtags <- senator_tweet_sample %>% 
+  mutate(hashtags = str_extract_all(text, hashtag_pattern)) %>%
+  unnest(hashtags) %>%
+  select(hashtags) %>%
+  count(hashtags) %>%
+  arrange(desc(n))
+
+head(senator_tweet_hashtags, 5)
 ```
 
 <br/>
