@@ -284,6 +284,10 @@ senate_net %>%
   labs(fill = c("Female", "Male"), title = "Network of Senators on at Least Three Subcommittees")
 ```
 
+```         
+Patterns: It seems like there are more males on the outside of the network.
+```
+
 <br/>
 
 **6. Find the average betweenness centrality (ignoring edge weights) of (ONLY) senators by gender after filtering edges that don't have at least three common subcommittees.**
