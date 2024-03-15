@@ -324,8 +324,8 @@ calculate_sentiment_score <- function(text) {
   sentiment_scores <- tokens %>%
     inner_join(sentiments, by = "word")
 
-  positive_count <- sum(sentiment_scores$sentiment == "positive")
-  negative_count <- sum(sentiment_scores$sentiment == "negative")
+  positive_count <- sum(sentiment_scores$sentiment == "positive", na.rm = TRUE)
+  negative_count <- sum(sentiment_scores$sentiment == "negative", na.rm = TRUE)
 
   return((positive_count - negative_count) / nrow(sentiment_scores))
 }
@@ -341,7 +341,7 @@ sentiment_tweets %>%
   geom_bar(stat='identity', position='dodge') +
   labs(title = "Sentiment of Tweets Published in Night vs. Day",
        x = "Time of Day",
-       y = "Average Sentiment")
+       y = "Average Sentiment (0: Negative, 1: Postive)")
 ```
 
 ```         
@@ -355,7 +355,36 @@ Explain why you chose to compute sentiment in this way.
 Hint: you may want to look at the bing dictionary (`get_sentiments("bing")`) to see how you should format your custom dictionary.
 
 ```{r}
-# your answer here
+custom_topic_dict <- data.frame(
+  word=c('bipartisan', 'together', ' agree', 'solidarity', 'youths', 'divisive', 'wrong', 'disagree', 'fail'), # list of words
+  category=c('unity', 'unity', 'unity', 'unity', 'unity', 'division', 'division', 'division', 'division') # list of categories associated with each word
+)
+
+calculate_sentiment_score <- function(text) {
+  tokens <- tibble(text = text) %>%
+    unnest_tokens(word, text)
+  
+  sentiment_scores <- tokens %>%
+    left_join(custom_topic_dict, by = "word")
+  
+  positive_count <- sum(sentiment_scores$category == "unity", na.rm = TRUE)
+  negative_count <- sum(sentiment_scores$category == "division", na.rm = TRUE)
+
+  return((positive_count - negative_count) / nrow(sentiment_scores))
+}
+
+polarizing_tweets <- senator_tweet_sample %>%
+  rowwise() %>%
+  mutate(sentiment = calculate_sentiment_score(text))
+
+polarizing_tweets %>%
+  group_by(time_of_day) %>%
+  summarise(proportion_sentiment = mean(sentiment, na.rm = TRUE)) %>%
+  ggplot(aes(x = time_of_day, y = proportion_sentiment)) +
+  geom_bar(stat='identity', position='dodge') +
+  labs(title = "Level of Unity of Tweets Published in Night vs. Day",
+       x = "Time of Day",
+       y = "Average Level of Unity (0: Divisive, 1: Unifying)")
 ```
 
 ```         
