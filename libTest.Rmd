@@ -1,0 +1,10 @@
+## Try GoodReads
+```{r}
+library("rgoodreads")
+
+```
+
+## Import CSV
+```{r}
+lib_data <- read.csv("./PLS_FY21_AE_pud21i.csv")
+```

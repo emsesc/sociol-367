@@ -642,9 +642,9 @@ lab.</strong></p>
 function.</p>
 <pre class="r"><code># way 1
 tweet_corpus &lt;- Corpus(VectorSource(as.vector(senator_tweet_sample$cleaned)))
-tweet_corpus &lt;- DocumentTermMatrix(tweet_corpus)
+tweet_dtm &lt;- DocumentTermMatrix(tweet_corpus)
 
-inspect(tweet_corpus)</code></pre>
+inspect(tweet_dtm)</code></pre>
 <pre><code>## &lt;&lt;DocumentTermMatrix (documents: 990, terms: 5877)&gt;&gt;
 ## Non-/sparse entries: 14877/5803353
 ## Sparsity           : 100%
@@ -663,6 +663,11 @@ inspect(tweet_corpus)</code></pre>
 ##   555     0     0   4   0   0    0   2    0    0    0
 ##   610     3     0   0   1   0    0   4    0    0    0
 ##   682     1     0   0   0   1    0   0    0    1    1</code></pre>
+<pre class="r"><code># way 2
+tweet_dtm &lt;- senator_tweet_sample |&gt; 
+  unnest_tokens(word, cleaned) |&gt; 
+  count(text, word) |&gt; 
+  cast_dtm(text, word, n)</code></pre>
 <p><br /></p>
 <p><strong>7. How could you potentially use text analysis in the final
 project you have been working on? (You don’t necessarily need to do it
@@ -676,7 +681,15 @@ playing with it. Either way, what did you find? Did your data have the
 information you needed after all? Was it as easy to access as you
 expected? Even if you’re not able to get all the data by now, write
 something about your plan for getting access to the data.</strong></p>
-<pre><code>response</code></pre>
+<pre><code>After attempting to query the GoodReads API, I found that they had stopped giving out API keys in December 2020, meaning that I would not be able to use the API unless I was able to find someone else&#39;s key to use.
+
+I was able to easily download the library survey data, and I was able to find other datasets on the site that might be useful, including a survey of individuals about library usage. I&#39;m think that I&#39;ll be able to aggregate these data in order to learn more about what populations these libraries are serving.
+
+I&#39;ve also narrowed my question to potentially asking &quot;How can we best support libraries that are targeted by book bans?&quot; through looking at library demographic data and other variables from the survey. I was able to access a banned books index, https://docs.google.com/spreadsheets/u/2/d/1hTs_PB7KuTMBtNMESFEGuK-0abzhNxVv4tgpI5-iKe8/edit?usp=sharing, but I noticed that a lot of the data corresponds with school districts rather than public libraries. It would be able to gain access to school district data, along with library visitor rate data. 
+
+I am also curious to see if book bans only raise more awareness around books, rather than only  restricting access to them after finding that a lot of organizations have created online access to banned books. This data could be collected through social media data and Google Trends data.
+
+My next course of plan in action is to contact a data specialist at Duke Libraries to ask if they have any suggestions for finding data on school and public libraries, along with contacting a researcher that I know has done GoodReads research.</code></pre>
 </div>
 
 

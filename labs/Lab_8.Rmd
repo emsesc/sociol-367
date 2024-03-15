@@ -204,9 +204,15 @@ HINT: you might want to check out the `cast_dtm` function.
 ```{r}
 # way 1
 tweet_corpus <- Corpus(VectorSource(as.vector(senator_tweet_sample$cleaned)))
-tweet_corpus <- DocumentTermMatrix(tweet_corpus)
+tweet_dtm <- DocumentTermMatrix(tweet_corpus)
 
-inspect(tweet_corpus)
+inspect(tweet_dtm)
+
+# way 2
+tweet_dtm <- senator_tweet_sample |> 
+  unnest_tokens(word, cleaned) |> 
+  count(text, word) |> 
+  cast_dtm(text, word, n)
 ```
 
 <br/>
@@ -222,5 +228,13 @@ If I end up incorporating the Goodreads API into my analysis of book bans, I cou
 **8. Last week you proposed some datasets that you might be able to use for our final projects in the class. If you haven't yet, try to download or otherwise get access to the dataset so you can start playing with it. Either way, what did you find? Did your data have the information you needed after all? Was it as easy to access as you expected? Even if you're not able to get all the data by now, write something about your plan for getting access to the data.**
 
 ```         
-response
+After attempting to query the GoodReads API, I found that they had stopped giving out API keys in December 2020, meaning that I would not be able to use the API unless I was able to find someone else's key to use.
+
+I was able to easily download the library survey data, and I was able to find other datasets on the site that might be useful, including a survey of individuals about library usage. I'm think that I'll be able to aggregate these data in order to learn more about what populations these libraries are serving.
+
+I've also narrowed my question to potentially asking "How can we best support libraries that are targeted by book bans?" through looking at library demographic data and other variables from the survey. I was able to access a banned books index, https://docs.google.com/spreadsheets/u/2/d/1hTs_PB7KuTMBtNMESFEGuK-0abzhNxVv4tgpI5-iKe8/edit?usp=sharing, but I noticed that a lot of the data corresponds with school districts rather than public libraries. It would be able to gain access to school district data, along with library visitor rate data. 
+
+I am also curious to see if book bans only raise more awareness around books, rather than only  restricting access to them after finding that a lot of organizations have created online access to banned books. This data could be collected through social media data and Google Trends data.
+
+My next course of plan in action is to contact a data specialist at Duke Libraries to ask if they have any suggestions for finding data on school and public libraries, along with contacting a researcher that I know has done GoodReads research.
 ```
