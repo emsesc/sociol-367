@@ -73,7 +73,7 @@ custom_topic_dict
 
 Now we'll clean the text, tokenize it, and apply our new dictionary. The dictionary is applied using a left join.
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 
 # define regex patterns for removal (you did these in previous problems)
 url_pattern <- "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -113,7 +113,7 @@ token_cats %>%
 
 **ex2. After removing URLs, stopwords, and "mentions" (cases where you see an "\@" followed by non-whitespace characters - see Lab 8 example problems) from the tweets in `senator_tweet_sample`, show the words that most uniquely appear in Tweets published by Republicans compard to other parties using TF-IDF.**
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # first match congress twitter handles with party
 congress_merged <- congress %>% 
   left_join(congress_contact, by='bioguide_id') %>% 
@@ -250,7 +250,38 @@ your written explanation here
 **4. Use TF-IDF to show the top 10 words that are most distinctive to Tweets published by Males and Females as a bar chart. To do this, you may combine texts from all Tweets published by these two genders, essentially treating our corpus as being two "documents" in the terminology that TF-IDF methods typically use. This approach provides a systematic way of comparing large number of texts along any dimension of interest.**
 
 ```{r}
-# your answer here
+# identifying urls
+url_pattern <- "(https?://|www\\.)\\S+"
+
+# identifying hashtags
+mention_pattern <- "@[A-Za-z0-9_]+"
+
+social_media_and_gender <- social_media_usernames %>%
+  left_join(congress) %>%
+  subset(platform == "twitter" & type == "sen") %>%
+  right_join(senator_tweet_sample, by = c("username" = "screen_name")) %>%
+  mutate(text = str_remove(text, url_pattern)) %>% # remove urls
+  mutate(text = str_remove(text, mention_pattern)) # remove mentions
+
+data(stop_words)
+gender_tweets <- social_media_and_gender %>%
+  select(gender, text) %>%
+  unnest_tokens("word", text) %>%
+  anti_join(stop_words) %>%
+  count(word, gender) %>%
+  bind_tf_idf(word, gender, n)
+
+gender_tweets %>%
+  arrange(desc(tf_idf)) %>%
+  head(10) %>%
+  group_by(gender) %>%
+  ggplot(aes(fill=gender, x = reorder(word, tf_idf), y = tf_idf)) +
+  geom_bar(stat='identity', position='dodge') +
+  labs(title = "Top 10 Distinctive Words by Gender",
+       x = "Words",
+       y = "Distinctiveness") +
+    scale_fill_manual("Gender", values=scales::brewer_pal(palette = "Set2")(2), labels=c("Female","Male")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ```         
@@ -268,7 +299,7 @@ senator_tweet_sample <- senator_tweet_sample %>%
   mutate(time_of_day = if_else(hour(created_at) >= 5 & hour(created_at) <= 17, "day", "night"))
 
 senator_tweet_sample %>%
-  count(time_of_day)
+  count(time_of_day) %>%
   ggplot(aes(x = time_of_day, y = n)) +
   geom_bar(stat='identity', position='dodge') +
   labs(title = "Tweets Published in Night vs. Day",
@@ -283,7 +314,8 @@ senator_tweet_sample %>%
 HINT: use `get_sentiments("bing")` to get the Bing dictionary.
 
 ```{r}
-# your answer here
+get_sentiments("bing")
+
 ```
 
 ```         
