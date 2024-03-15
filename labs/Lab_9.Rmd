@@ -185,7 +185,12 @@ mention_pattern <- "@[A-Za-z0-9_]+"
 # identifying hashtags
 hashtag_pattern <- "#[A-Za-z0-9_]+"
 
-hashtags <- data.frame(word = regmatches(senator_tweet_sample$text, regexpr(hashtag_pattern, senator_tweet_sample$text)))
+hashtags <- senator_tweet_sample %>% 
+  mutate(word = str_extract_all(text, hashtag_pattern)) %>%
+  unnest(word) %>%
+  select(word) %>%
+  count(word) %>%
+  arrange(desc(n))
 
 senator_tweet_sample <- senator_tweet_sample %>%
   mutate(cleaned = str_replace_all(text, paste0(url_pattern, "|", mention_pattern, "|", hashtag_pattern), ""))
@@ -197,13 +202,13 @@ words <- senator_tweet_sample %>%
   anti_join(stop_words) %>%
   filter(word != "amp") %>%
   select(word) %>%
-  rbind(hashtags) %>%
   count(word) %>%
+  rbind(hashtags) %>%
   arrange(desc(n))
 
 words %>% 
   head(20) %>%
-  ggplot(aes(x = word, y = n)) +
+  ggplot(aes(x = reorder(word, n), y = n)) +
   coord_flip() +
   geom_bar(stat='identity', position='dodge') +
   labs(title = "Top 20 Most Used Tokens",
@@ -212,8 +217,9 @@ words %>%
 
 hashtags %>%
   count(word) %>%
+  arrange(desc(n)) %>%
   head(20) %>%
-  ggplot(aes(x = word, y = n)) +
+  ggplot(aes(x = reorder(word, n), y = n)) +
   coord_flip() +
   geom_bar(stat='identity', position='dodge') +
   labs(title = "Top 20 Most Used Hashtags",
@@ -226,7 +232,9 @@ hashtags %>%
 **3. For each of the top three most frequent non-stopword tokens, extract up to three tweets with the highest number of retweets that include the token. Based on the context provided in these Tweets, give a quick sentence about how they seem to be used and why they might appear frequently.**
 
 ```{r}
-# your answer here
+top_3 <- words %>% head(3)
+
+senator_tweet_
 ```
 
 ```         
