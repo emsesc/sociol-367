@@ -264,7 +264,16 @@ your written explanation here
 Hint: see the `hour` function of lubridate.
 
 ```{r}
-# your answer here
+senator_tweet_sample <- senator_tweet_sample %>%
+  mutate(time_of_day = if_else(hour(created_at) >= 5 & hour(created_at) <= 17, "day", "night"))
+
+senator_tweet_sample %>%
+  count(time_of_day)
+  ggplot(aes(x = time_of_day, y = n)) +
+  geom_bar(stat='identity', position='dodge') +
+  labs(title = "Tweets Published in Night vs. Day",
+       x = "Time of Day",
+       y = "Frequency")
 ```
 
 <br/>
