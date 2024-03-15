@@ -216,8 +216,6 @@ words %>%
        y = "Frequency")
 
 hashtags %>%
-  count(word) %>%
-  arrange(desc(n)) %>%
   head(20) %>%
   ggplot(aes(x = reorder(word, n), y = n)) +
   coord_flip() +
@@ -233,8 +231,14 @@ hashtags %>%
 
 ```{r}
 top_3 <- words %>% head(3)
+senator_tweet_sample_sorted <- senator_tweet_sample %>% arrange(desc(retweet_count))
 
-senator_tweet_
+for (token in top_3$word) {
+  temp <- senator_tweet_sample_sorted$text[grep(token, senator_tweet_sample_sorted$text, ignore.case = TRUE)] %>% head(3)
+  print(paste0("-------------- TOKEN: ", token, " --------------"))
+  print(temp)
+  print("----------------------------")
+}
 ```
 
 ```         
