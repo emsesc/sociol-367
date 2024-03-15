@@ -314,8 +314,34 @@ senator_tweet_sample %>%
 HINT: use `get_sentiments("bing")` to get the Bing dictionary.
 
 ```{r}
-get_sentiments("bing")
+sentiments <- get_sentiments("bing")
 
+# Define the function
+calculate_sentiment_score <- function(text) {
+  tokens <- tibble(text = text) %>%
+    unnest_tokens(word, text)
+  
+  sentiment_scores <- tokens %>%
+    inner_join(sentiments, by = "word")
+
+  positive_count <- sum(sentiment_scores$sentiment == "positive")
+  negative_count <- sum(sentiment_scores$sentiment == "negative")
+
+  return((positive_count - negative_count) / nrow(sentiment_scores))
+}
+
+sentiment_tweets <- senator_tweet_sample %>%
+  rowwise() %>%
+  mutate(sentiment = calculate_sentiment_score(text))
+
+sentiment_tweets %>%
+  group_by(time_of_day) %>%
+  summarise(proportion_sentiment = mean(sentiment, na.rm = TRUE)) %>%
+  ggplot(aes(x = time_of_day, y = proportion_sentiment)) +
+  geom_bar(stat='identity', position='dodge') +
+  labs(title = "Sentiment of Tweets Published in Night vs. Day",
+       x = "Time of Day",
+       y = "Average Sentiment")
 ```
 
 ```         
