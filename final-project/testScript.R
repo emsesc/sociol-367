@@ -18,8 +18,30 @@ library_survey <- library_survey %>%
 
 # Perform cross join
 pen_index_counties <- left_join(pen_index, school_districts, by = "school_district", relationship = "many-to-many")
-merged <- left_join(pen_index_counties, library_survey, by = "County_Merge", relationship = "many-to-many")
+merged <- full_join(pen_index_counties, library_survey, by = "County_Merge", relationship = "many-to-many")
 
 
 # Drop the intermediate lowercase columns
-merged <- select(merged, -CNTY, -County_Merge, -school_district, -Secondary.Author.s, -Illustrator.s, -Translator.s, -Series.Name)
+merged <- select(merged, -CNTY, -school_district, -Secondary.Author.s., -Illustrator.s., -Translator.s., -Series.Name)
+
+################################## mapping
+
+# Load necessary libraries
+library(leaflet)
+library(tidygeocoder)
+
+merged <- merged %>%
+  mutate(full_address = paste(ADDRESS, CITY, ZIP, sep = ", "))
+
+# Define a color palette for the districts
+district_colors <- rainbow(n_distinct(merged$District))
+
+# Plotting
+leaflet(merged) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    ~LONGITUD, ~LATITUDE,
+    color = district_colors[as.factor(merged$District)],
+    radius = sqrt(merged$TOTSTAFF[!is.na(merged$TOTSTAFF)]) * 0.1,  # Size scaled by TOTSTAFF, ignoring NaN values
+    popup = ~paste(ADDRESS, "<br>", CITY, ", ", ZIP, sep = "")
+  )
