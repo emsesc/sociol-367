@@ -349,7 +349,9 @@ sentiment_tweets %>%
 ```
 
 ```         
-Explain why you chose to compute sentiment in this way.
+I chose to take a normalized score of the difference between positive and negative coutns because I believe that is the best way to represent the valence of the positive/negative sentiment. This way gives equal weighting to both, and can account for the possibility that some negatively connotated words are used in a positive way. The normalized score (calculated by dividing by the total count) also provides a standardized number between 0 and 1 to compare with others.
+
+By the results, the average sentiment for "night" is closer to 1 (positive sentiment) than the average sentiment for "day". This would imply that tweets tend to be more positive when posted at night.
 ```
 
 <br/>
@@ -360,8 +362,8 @@ Hint: you may want to look at the bing dictionary (`get_sentiments("bing")`) to 
 
 ```{r}
 custom_topic_dict <- data.frame(
-  word=c('bipartisan', 'together', ' agree', 'solidarity', 'youths', 'divisive', 'wrong', 'disagree', 'fail'), # list of words
-  category=c('unity', 'unity', 'unity', 'unity', 'unity', 'division', 'division', 'division', 'division') # list of categories associated with each word
+  word=c('bipartisan', 'together', ' agree', 'solidarity', 'divisive', 'wrong', 'disagree', 'fail'), # list of words
+  category=c('unity', 'unity', 'unity', 'unity', 'division', 'division', 'division', 'division') # list of categories associated with each word
 )
 
 calculate_sentiment_score <- function(text) {
@@ -392,7 +394,7 @@ polarizing_tweets %>%
 ```
 
 ```         
-Explain what your dictionary is intended to capture and interpret the results.
+My dictionary is intended to capture the level of "unity" or "togetherness" a tweet has. A tweet with a score of 0 is divisive, and a score of 1 is uniting. The graph shows that the tweets tend to have a valence closer to 1 during night time, which implies that tweets tend to be more divisive during the day.
 ```
 
 <br/>
