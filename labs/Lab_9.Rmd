@@ -166,7 +166,7 @@ tf_idf_scores %>%
 **1. In which scenarios would it be best to consider dictionary-based approaches to text analysis? How does the decision to use dictionary-based approaches shape the research questions you can ask?**
 
 ```         
-# your answer here
+Scenarios in which the research goals include the identification of specific topics, sentiment analysis, or more generally, detecting opinions or emotions around an issue are best for considering use of dictionary-based approaches. The scenario should also have a relevant and high-quality dictionary for best practice. Depending on what the goals of the research study is, using dictionary-based approaches affect the outcome variables of the research. For example, the research questions would now be centered around the categories that the dictionary-based approach identifies. If the analysis yields a valence score, the research question would be shaped around this spectrum.
 ```
 
 <br/>
@@ -242,7 +242,11 @@ for (token in top_3$word) {
 ```
 
 ```         
-your written explanation here
+The token "bill" is used under the context of a piece of legislation not yet made into law, typically used in tweets when legislators want a "bill" to be passed. This token is likely to appear frequently because the job of the members of congress is ultimately to pass laws that their constituents would favor. Therefore, their tweets are a way to communicate to the public about what they are supporting.
+
+The token "senate" is used under the context of Senate of the United States Congress. This token is likely to appear frequently because the Senate is an important factor in getting bills passed, and the Twitter accounts that wrote these tweetes are part of the Senate.
+
+The token "health" is used under the context of "health care" in legislation. This token is likely to appear frequently because health care coverage is a constantly hot topic in the interests of constituents and therefore legislation.
 ```
 
 <br/>
