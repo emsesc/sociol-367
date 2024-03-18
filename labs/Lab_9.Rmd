@@ -275,21 +275,35 @@ gender_tweets <- social_media_and_gender %>%
   count(word, gender) %>%
   bind_tf_idf(word, gender, n)
 
-gender_tweets %>%
+f_tweets <- gender_tweets %>%
+  subset(gender == "F")
+
+m_tweets <- gender_tweets %>%
+  subset(gender == "M")
+
+f_tweets %>%
   arrange(desc(tf_idf)) %>%
   head(10) %>%
-  group_by(gender) %>%
-  ggplot(aes(fill=gender, x = reorder(word, tf_idf), y = tf_idf)) +
+  ggplot(aes(x = reorder(word, tf_idf), y = tf_idf)) +
   geom_bar(stat='identity', position='dodge') +
-  labs(title = "Top 10 Distinctive Words by Gender",
+  labs(title = "Top 10 Distinctive Words for Female Senator Tweets",
        x = "Words",
        y = "Distinctiveness") +
-    scale_fill_manual("Gender", values=scales::brewer_pal(palette = "Set2")(2), labels=c("Female","Male")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+m_tweets %>%
+  arrange(desc(tf_idf)) %>%
+  head(10) %>%
+  ggplot(aes(x = reorder(word, tf_idf), y = tf_idf)) +
+  geom_bar(stat='identity', position='dodge') +
+  labs(title = "Top 10 Distinctive Words for Male Senator Tweets",
+       x = "Words",
+       y = "Distinctiveness") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ```         
-your written explanation here
+N/A
 ```
 
 <br/>
