@@ -260,12 +260,16 @@ url_pattern <- "(https?://|www\\.)\\S+"
 # identifying hashtags
 mention_pattern <- "@[A-Za-z0-9_]+"
 
-social_media_and_gender <- congress_contact %>%
-  left_join(congress) %>%
+senator_tweet_sample <- senator_tweet_sample %>%
+    mutate(screen_name = tolower(screen_name))
+
+social_media_and_gender <- congress %>%
+  left_join(congress_contact, by = "bioguide_id") %>%
   subset(type == "sen") %>%
+  mutate(twitter = tolower(twitter)) %>%
   right_join(senator_tweet_sample, by = c("twitter" = "screen_name")) %>%
-  mutate(text = str_remove(text, url_pattern)) %>% # remove urls
-  mutate(text = str_remove(text, mention_pattern)) # remove mentions
+  mutate(text = str_remove_all(text, url_pattern)) %>% # remove urls
+  mutate(text = str_remove_all(text, mention_pattern)) # remove mentions
 
 data(stop_words)
 gender_tweets <- social_media_and_gender %>%
@@ -284,7 +288,7 @@ m_tweets <- gender_tweets %>%
 f_tweets %>%
   arrange(desc(tf_idf)) %>%
   head(10) %>%
-  ggplot(aes(x = reorder(word, tf_idf), y = tf_idf)) +
+  ggplot(aes(x = reorder(word, tf_idf), y = tf_idf, fill = word)) +
   geom_bar(stat='identity', position='dodge') +
   labs(title = "Top 10 Distinctive Words for Female Senator Tweets",
        x = "Words",
@@ -294,7 +298,7 @@ f_tweets %>%
 m_tweets %>%
   arrange(desc(tf_idf)) %>%
   head(10) %>%
-  ggplot(aes(x = reorder(word, tf_idf), y = tf_idf)) +
+  ggplot(aes(x = reorder(word, tf_idf), y = tf_idf, fill = word)) +
   geom_bar(stat='identity', position='dodge') +
   labs(title = "Top 10 Distinctive Words for Male Senator Tweets",
        x = "Words",
@@ -318,7 +322,7 @@ senator_tweet_sample <- senator_tweet_sample %>%
 
 senator_tweet_sample %>%
   count(time_of_day) %>%
-  ggplot(aes(x = time_of_day, y = n)) +
+  ggplot(aes(x = time_of_day, y = n, fill = time_of_day)) +
   geom_bar(stat='identity', position='dodge') +
   labs(title = "Tweets Published in Night vs. Day",
        x = "Time of Day",
@@ -355,7 +359,7 @@ sentiment_tweets <- senator_tweet_sample %>%
 sentiment_tweets %>%
   group_by(time_of_day) %>%
   summarise(proportion_sentiment = mean(sentiment, na.rm = TRUE)) %>%
-  ggplot(aes(x = time_of_day, y = proportion_sentiment)) +
+  ggplot(aes(x = time_of_day, y = proportion_sentiment, fill = time_of_day)) +
   geom_bar(stat='identity', position='dodge') +
   labs(title = "Sentiment of Tweets Published in Night vs. Day",
        x = "Time of Day",
@@ -400,7 +404,7 @@ polarizing_tweets <- senator_tweet_sample %>%
 polarizing_tweets %>%
   group_by(time_of_day) %>%
   summarise(proportion_sentiment = mean(sentiment, na.rm = TRUE)) %>%
-  ggplot(aes(x = time_of_day, y = proportion_sentiment)) +
+  ggplot(aes(x = time_of_day, y = proportion_sentiment, fill = time_of_day)) +
   geom_bar(stat='identity', position='dodge') +
   labs(title = "Level of Unity of Tweets Published in Night vs. Day",
        x = "Time of Day",
