@@ -459,7 +459,7 @@ Republicans compard to other parties using TF-IDF.</strong></p>
 dictionary-based approaches to text analysis? How does the decision to
 use dictionary-based approaches shape the research questions you can
 ask?</strong></p>
-<pre><code>Scenarios in which the research goals include the identification of specific topics, sentiment analysis, or more generally, detecting opinions or emotions around an issue are best for considering use of dictionary-based approaches. The scenario should also have a relevant and high-quality dictionary for best practice. Depending on what the goals of the research study is, using dictionary-based approaches affect the outcome variables of the research. For example, the research questions would now be centered around the categories that the dictionary-based approach identifies. If the analysis yields a valence score, the research question would be shaped around this spectrum.</code></pre>
+<pre><code>Scenarios in which the research goals include the identification of specific topics, sentiment analysis, or more generally, detecting opinions or emotions around an issue are best for considering use of dictionary-based approaches. The scenario should also have a relevant and high-quality dictionary for best practice. Depending on what the goals of the research study is, using dictionary-based approaches affect the outcome variables of the research. For example, the research questions would now be centered around the categories that the dictionary-based approach identifies. If the analysis yields a valence score, the research question would be shaped around this spectrum. Additionally, because words in the dictionaries can have multiple meanings within different contexts and dialects of the same language, the research questions should also take that into consideration.</code></pre>
 <p><br /></p>
 <p><strong>2. Create a bar graph showing the frequencies of the twenty
 most-used tokens in our <code>senator_tweet_sample</code> corpus after
@@ -529,15 +529,15 @@ appear frequently.</strong></p>
 senator_tweet_sample_sorted &lt;- senator_tweet_sample %&gt;% arrange(desc(retweet_count))
 
 for (token in top_3$word) {
-  temp &lt;- senator_tweet_sample_sorted$text[grep(token, senator_tweet_sample_sorted$text, ignore.case = TRUE)] %&gt;% head(3)
+  temp &lt;- senator_tweet_sample_sorted$text[grep(paste0(&quot;\\b&quot;, token, &quot;\\b&quot;), senator_tweet_sample_sorted$text, ignore.case = TRUE)] %&gt;% head(3)
   print(paste0(&quot;-------------- TOKEN: &quot;, token, &quot; --------------&quot;))
   print(temp)
   print(&quot;----------------------------&quot;)
 }</code></pre>
 <pre><code>## [1] &quot;-------------- TOKEN: bill --------------&quot;
-## [1] &quot;Here is a new summary of the health bill the Senate is considering passing.\n\nRT if helpful. https://t.co/EHlBf158AL&quot;                                                                                                 
-## [2] &quot;Sound the alarm! Senate Republicans’ tax-cut bill is now an attack on the Affordable Care Act. 13 million people will lose their health coverage if this passes! #GOPTaxPlan&quot;                                          
-## [3] &quot;After the #GOPTaxScam, corporations are announcing a slew of billion-dollar stock buyback programs, &amp;amp; they come with a catch. @SenateMajldr won&#39;t come to the floor to report this. He&#39;ll only talk about bonuses.&quot;
+## [1] &quot;Here is a new summary of the health bill the Senate is considering passing.\n\nRT if helpful. https://t.co/EHlBf158AL&quot;                                                       
+## [2] &quot;Sound the alarm! Senate Republicans’ tax-cut bill is now an attack on the Affordable Care Act. 13 million people will lose their health coverage if this passes! #GOPTaxPlan&quot;
+## [3] &quot;No help from Dems? R&#39;s crafted a bill in secret w/no public hearings &amp;amp; will skip committee review. Open up the process! #PeopleNotPolitics https://t.co/6dKn5Lf9ew&quot;      
 ## [1] &quot;----------------------------&quot;
 ## [1] &quot;-------------- TOKEN: senate --------------&quot;
 ## [1] &quot;Here is a new summary of the health bill the Senate is considering passing.\n\nRT if helpful. https://t.co/EHlBf158AL&quot;                                                       

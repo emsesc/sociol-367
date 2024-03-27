@@ -166,7 +166,7 @@ tf_idf_scores %>%
 **1. In which scenarios would it be best to consider dictionary-based approaches to text analysis? How does the decision to use dictionary-based approaches shape the research questions you can ask?**
 
 ```         
-Scenarios in which the research goals include the identification of specific topics, sentiment analysis, or more generally, detecting opinions or emotions around an issue are best for considering use of dictionary-based approaches. The scenario should also have a relevant and high-quality dictionary for best practice. Depending on what the goals of the research study is, using dictionary-based approaches affect the outcome variables of the research. For example, the research questions would now be centered around the categories that the dictionary-based approach identifies. If the analysis yields a valence score, the research question would be shaped around this spectrum.
+Scenarios in which the research goals include the identification of specific topics, sentiment analysis, or more generally, detecting opinions or emotions around an issue are best for considering use of dictionary-based approaches. The scenario should also have a relevant and high-quality dictionary for best practice. Depending on what the goals of the research study is, using dictionary-based approaches affect the outcome variables of the research. For example, the research questions would now be centered around the categories that the dictionary-based approach identifies. If the analysis yields a valence score, the research question would be shaped around this spectrum. Additionally, because words in the dictionaries can have multiple meanings within different contexts and dialects of the same language, the research questions should also take that into consideration.
 ```
 
 <br/>
@@ -234,7 +234,7 @@ top_3 <- words %>% head(3)
 senator_tweet_sample_sorted <- senator_tweet_sample %>% arrange(desc(retweet_count))
 
 for (token in top_3$word) {
-  temp <- senator_tweet_sample_sorted$text[grep(token, senator_tweet_sample_sorted$text, ignore.case = TRUE)] %>% head(3)
+  temp <- senator_tweet_sample_sorted$text[grep(paste0("\\b", token, "\\b"), senator_tweet_sample_sorted$text, ignore.case = TRUE)] %>% head(3)
   print(paste0("-------------- TOKEN: ", token, " --------------"))
   print(temp)
   print("----------------------------")
